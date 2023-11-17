@@ -91,7 +91,7 @@ namespace DefaultNamespace
             }
 
             Rename();
-            StripURDF();
+            //StripURDF();
 
             var wiggler = GetComponent<SAMThrusterWiggler>();
             wiggler.Setup(robot);
