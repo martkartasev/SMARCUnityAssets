@@ -61,6 +61,7 @@ namespace DefaultNamespace
             var r1 = rpm1 / 2000; // Normalize with assumption that max == 2000
             var r2 = rpm2 / 2000;
 
+            Debug.Log(baseLink.inertiaTensor + ":::" + nozzleLink.inertiaTensor);
 
             nozzleLink.SetDriveTarget(ArticulationDriveAxis.Y, -Mathf.Rad2Deg * d_rudder);
             nozzleLink.SetDriveTarget(ArticulationDriveAxis.Z, Mathf.Rad2Deg * d_aileron);
@@ -68,8 +69,8 @@ namespace DefaultNamespace
             propeller1.SetDriveTargetVelocity(ArticulationDriveAxis.X, (float)(r1 * 2000));
             propeller2.SetDriveTargetVelocity(ArticulationDriveAxis.X, (float)(-r2 * 2000));
 
-            thrustLink.AddRelativeForce(new Vector3(0, 0, 5) * (float)r1);
-            thrustLink.AddRelativeForce(new Vector3(0, 0, 5) * (float)r2);
+            thrustLink.AddForce(thrustLink.transform.forward * (float)r1 * 5);
+            thrustLink.AddForce(thrustLink.transform.forward * (float)r2 * 5);
         }
 
 
