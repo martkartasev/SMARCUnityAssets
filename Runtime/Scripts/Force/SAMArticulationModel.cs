@@ -63,14 +63,14 @@ namespace DefaultNamespace
 
             Debug.Log(baseLink.inertiaTensor + ":::" + nozzleLink.inertiaTensor);
 
-            nozzleLink.SetDriveTarget(ArticulationDriveAxis.Y, -Mathf.Rad2Deg * d_rudder);
-            nozzleLink.SetDriveTarget(ArticulationDriveAxis.Z, Mathf.Rad2Deg * d_aileron);
+            nozzleLink.SetDriveTarget(ArticulationDriveAxis.X, -Mathf.Rad2Deg * d_rudder);
+            thrustLink.SetDriveTarget(ArticulationDriveAxis.X, Mathf.Rad2Deg * d_aileron);
 
             propeller1.SetDriveTargetVelocity(ArticulationDriveAxis.X, (float)(r1 * 2000));
             propeller2.SetDriveTargetVelocity(ArticulationDriveAxis.X, (float)(-r2 * 2000));
 
-            thrustLink.AddForce(thrustLink.transform.forward * (float)r1 * 5);
-            thrustLink.AddForce(thrustLink.transform.forward * (float)r2 * 5);
+            thrustLink.AddForce(propeller1.transform.forward * (float)r1 * 5);
+            thrustLink.AddForce(propeller2.transform.forward * (float)r2 * 5);
         }
 
 
