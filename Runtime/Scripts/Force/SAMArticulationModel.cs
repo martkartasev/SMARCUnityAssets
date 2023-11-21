@@ -65,12 +65,11 @@ namespace DefaultNamespace
             nozzleLink.SetDriveTarget(ArticulationDriveAxis.Y, -Mathf.Rad2Deg * d_rudder);
             nozzleLink.SetDriveTarget(ArticulationDriveAxis.Z, Mathf.Rad2Deg * d_aileron);
 
-            thrustLink.SetDriveTarget(ArticulationDriveAxis.X, (float)(r1 * thrustLink.xDrive.upperLimit));
-
             propeller1.SetDriveTargetVelocity(ArticulationDriveAxis.X, (float)(r1 * 2000));
             propeller2.SetDriveTargetVelocity(ArticulationDriveAxis.X, (float)(-r2 * 2000));
 
-            thrustLink.AddRelativeForce(new Vector3(0, 0, 10) * (float)r1);
+            thrustLink.AddRelativeForce(new Vector3(0, 0, 5) * (float)r1);
+            thrustLink.AddRelativeForce(new Vector3(0, 0, 5) * (float)r2);
         }
 
 

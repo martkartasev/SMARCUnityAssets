@@ -70,7 +70,7 @@ namespace DefaultNamespace
             var globalDirection = transform.TransformDirection(localScaled);
             return globalDirection;
         }
-
+        
         public Vector3 GetTorqueDamping()
         {
             throw new System.NotImplementedException();

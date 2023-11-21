@@ -19,24 +19,22 @@ public class ForcePoint : MonoBehaviour
     public float depthBeforeSubmerged = 1.5f;
     public float displacementAmount = 1f;
 
-    IForceModel _forceModel;
-
     public GameObject motionModel;
-
+    public bool addGravity = false;
     public void Awake()
     {
-        if (motionModel == null) Debug.Log("ForcePoints require a motionModel object with a rigidbody or child articulation bodies to function!");
+        if (motionModel == null) Debug.Log("ForcePoints require a motionModel object with a rigidbody to function!");
         _rigidbody = motionModel.GetComponent<Rigidbody>();
         if (_rigidbody == null)
         {
             _articulationBody = motionModel
                 .GetComponentsInChildren<ArticulationBody>()
                 .First(body => body.isRoot);
-            _articulationBody.useGravity = false;
+            addGravity = !_articulationBody.useGravity;
         }
         else
         {
-            _rigidbody.useGravity = false;
+            addGravity = !_rigidbody.useGravity;
         }
 
         if (motionModel == null && _articulationBody == null)
@@ -45,21 +43,24 @@ public class ForcePoint : MonoBehaviour
         }
 
         _waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
-        _forceModel = motionModel.GetComponent<IForceModel>();
-
         _pointCount = transform.parent.gameObject.GetComponentsInChildren<ForcePoint>().Length;
+       
     }
 
     private void FixedUpdate()
     {
         var forcePointPosition = transform.position;
-        if (_rigidbody != null)
+        if (addGravity)
         {
-            _rigidbody.AddForceAtPosition(Physics.gravity / _pointCount, forcePointPosition);
-        }
-        else
-        {
-            _articulationBody.AddForceAtPosition(Physics.gravity / _pointCount, forcePointPosition);
+            if (_rigidbody != null)
+            {
+                _rigidbody.AddForceAtPosition(_rigidbody.mass * Physics.gravity / _pointCount, forcePointPosition);
+            }
+            else
+            {
+                _articulationBody.AddForceAtPosition(_articulationBody.mass * Physics.gravity / _pointCount, forcePointPosition);
+            }
+
         }
 
 
@@ -71,22 +72,16 @@ public class ForcePoint : MonoBehaviour
             if (_rigidbody != null)
             {
                 _rigidbody.AddForceAtPosition(
-                    new Vector3(0, Math.Abs(Physics.gravity.y) * displacementMultiplier / _pointCount, 0),
+                    new Vector3(0, _rigidbody.mass *Math.Abs(Physics.gravity.y) * displacementMultiplier / _pointCount, 0),
                     forcePointPosition);
             }
             else
             {
                 _articulationBody.AddForceAtPosition(
-                    new Vector3(0, Math.Abs(Physics.gravity.y) * displacementMultiplier / _pointCount, 0),
+                    new Vector3(0, _articulationBody.mass *Math.Abs(Physics.gravity.y) * displacementMultiplier / _pointCount, 0),
                     forcePointPosition);
             }
-
-
-            if (_forceModel != null)
-            {
-                //    _rigidbody.AddRelativeForce(_forceModel.GetForceDamping() / _pointCount, ForceMode.Force);
-                //    _rigidbody.AddRelativeTorque(_forceModel.GetTorqueDamping() / _pointCount, ForceMode.Force);
-            }
         }
+
     }
 }
