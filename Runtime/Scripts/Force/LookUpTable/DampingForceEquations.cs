@@ -24,15 +24,15 @@ namespace Force.LookUpTable
 
         public static (Vector3 forces, Vector3 moments) CalculateDamping(Rigidbody rb, Transform samTransform)
         {
-            var uvw_nm_nb = samTransform.InverseTransformDirection(rb.velocity).To<NED>().ToDense(); // Might need to revisit. Rel. velocity in point m block.
-            var pqr_nm = samTransform.InverseTransformDirection(rb.angularVelocity).To<NED>().ToDense();
+            var uvw_nm_nb = NED.ConvertFromRUF(samTransform.InverseTransformDirection(rb.velocity)).ToDense(); // Might need to revisit. Rel. velocity in point m block.
+            var pqr_nm = FRD.ConvertAngularVelocityFromRUF(samTransform.InverseTransformDirection(rb.angularVelocity)).ToDense();
 
             var aoa_alpha_angleOfAttack = AngleOfAttack(uvw_nm_nb);
             var (forces, moments) = CalculateMomentsForces(uvw_nm_nb, pqr_nm, aoa_alpha_angleOfAttack);
 
-            NED.ConvertToRUF()
-            var forcesUnity = new Vector3(forces.y, -forces.z, forces.x);
-            var momentsUnity = new Vector3(moments.y, -moments.z, moments.x);
+           
+            var forcesUnity = NED.ConvertToRUF(forces);
+            var momentsUnity = NED.ConvertToRUF(forces);
             Debug.Log("Velocities: " + uvw_nm_nb.ToVector3() + " : " + pqr_nm.ToVector3() + "       Damping: " + forces + " : " + moments);
             return (forcesUnity, momentsUnity);
         }

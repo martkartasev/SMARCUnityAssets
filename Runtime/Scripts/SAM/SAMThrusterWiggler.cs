@@ -1,3 +1,4 @@
+using Force;
 using UnityEngine;
 
 namespace DefaultNamespace
@@ -17,6 +18,7 @@ namespace DefaultNamespace
             // so that we dont care what is controlling that model
             var sam_motion_model = robot.transform.gameObject;
             _samForceModel = GetComponent<ISAMControl>();
+            if(_samForceModel == null) _samForceModel = GetComponentInChildren<ISAMControl>();
 
             // Need access to the thruster_yaw_link object
             // Normally the transform.Find method would work for this, but

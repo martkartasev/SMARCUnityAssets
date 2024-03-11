@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Force;
 using UnityEngine;
 
 namespace DefaultNamespace
@@ -104,16 +105,22 @@ namespace DefaultNamespace
                 _samControl.SetElevatorAngle(0);
                 if(takeOverRosController) rosControl.enable=false;
             }
+            
+            if (Input.GetKeyDown("f")) 
+            {
+                points.ForEach(point => point.displacementAmount = 0.921f ); // Float
+                if(takeOverRosController) rosControl.enable=false;
+            }
 
             if (Input.GetKeyDown("c"))
             {
-                points.ForEach(point => point.displacementWaterCoefficent = 1.0f );
+                points.ForEach(point => point.displacementAmount = 0.915f ); //Submerge
                 if(takeOverRosController) rosControl.enable=false;
             }
 
             if (Input.GetKeyDown("space"))
             {
-                points.ForEach(point => point.displacementWaterCoefficent = 1.1f );
+                points.ForEach(point => point.displacementAmount = 0.93f ); // Rise
                 if(takeOverRosController) rosControl.enable=false;
             }
 
