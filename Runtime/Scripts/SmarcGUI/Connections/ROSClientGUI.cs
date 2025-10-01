@@ -11,6 +11,13 @@ namespace SmarcGUI.Connections
 {
     public class ROSClientGUI : MonoBehaviour
     {
+        [Header("Connection Settings")]
+        [Tooltip("If true, the default settings below will override any saved settings file.")]
+        public bool OverrideSettingsFile = false;
+        public string DefaultServerAddress = "localhost";
+        public int DefaultPort = 10000;
+        public bool ConnectOnStart = false;
+
         [Header("UI Elements")]
         public TMP_InputField ServerAddressInput;
         public TMP_InputField PortInput;
@@ -56,23 +63,27 @@ namespace SmarcGUI.Connections
         {
             rosCon = ROSConnection.GetOrCreateInstance();
 
+            bool connectNow = false;
+
             string settingsStoragePath = Path.Combine(GUIState.GetStoragePath(), "Settings");
             Directory.CreateDirectory(settingsStoragePath);
             string settingsFile = Path.Combine(settingsStoragePath, "ROSSettings.yaml");
-            if(File.Exists(settingsFile))
+            if (File.Exists(settingsFile))
             {
                 var settings = File.ReadAllText(settingsFile);
                 var deserializer = new YamlDotNet.Serialization.Deserializer();
                 var settingsDict = deserializer.Deserialize<Dictionary<string, string>>(settings);
-                if(settingsDict.ContainsKey("ROS_TCP_ConnectorIP")) ServerAddressInput.text = settingsDict["ROS_TCP_ConnectorIP"];
-                if(settingsDict.ContainsKey("ROS_TCP_ConnectorPort")) PortInput.text = settingsDict["ROS_TCP_ConnectorPort"];
+                if (settingsDict.ContainsKey("ROS_TCP_ConnectorIP")) ServerAddressInput.text = settingsDict["ROS_TCP_ConnectorIP"];
+                if (settingsDict.ContainsKey("ROS_TCP_ConnectorPort")) PortInput.text = settingsDict["ROS_TCP_ConnectorPort"];
+                if (settingsDict.ContainsKey("ConnectOnStart")) connectNow = settingsDict["ConnectOnStart"].ToLower() == "true";
             }
             else
             {
                 var settingsDict = new Dictionary<string, string>
                 {
                     { "ROS_TCP_ConnectorIP", rosCon.RosIPAddress.ToString() },
-                    { "ROS_TCP_ConnectorPort", rosCon.RosPort.ToString() }
+                    { "ROS_TCP_ConnectorPort", rosCon.RosPort.ToString() },
+                    { "ConnectOnStart", "false" }
                 };
                 var serializer = new YamlDotNet.Serialization.Serializer();
                 var settingsYaml = serializer.Serialize(settingsDict);
@@ -80,13 +91,22 @@ namespace SmarcGUI.Connections
                 guiState.Log($"No ROS settings file found. Created default settings file at {settingsFile}");
                 ServerAddressInput.text = rosCon.RosIPAddress.ToString();
                 PortInput.text = rosCon.RosPort.ToString();
+                rosCon.ConnectOnStart = false;
             }
 
-            
+            if (OverrideSettingsFile)
+            {
+                ServerAddressInput.text = DefaultServerAddress;
+                PortInput.text = DefaultPort.ToString();
+                connectNow = ConnectOnStart;
+            }
+
             ConnectButton.onClick.AddListener(ToggleConnection);
-            if(joyPub!=null) PublishControllerToRosToggle.onValueChanged.AddListener(value => joyPub.enabled = value);
+            if (joyPub != null) PublishControllerToRosToggle.onValueChanged.AddListener(value => joyPub.enabled = value);
             else PublishControllerToRosToggle.interactable = false;
             rosCon.ShowHud = false;
+            
+            if (connectNow) ToggleConnection();
         }
 
         void ConnectionInputsInteractable(bool interactable)
