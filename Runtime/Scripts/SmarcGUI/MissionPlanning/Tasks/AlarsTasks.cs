@@ -3,6 +3,16 @@ using SmarcGUI.MissionPlanning.Params;
 namespace SmarcGUI.MissionPlanning.Tasks
 {
 
+    public class AlarsBT : Task
+    {
+        public override void SetParams()
+        {
+            Name = "alars-bt";
+            Description = "Run the entire ALARS system";
+            Params.Add("search_position", new GeoPoint());
+        }
+    }
+
     public class AlarsSearch : Task
     {
         public override void SetParams()
