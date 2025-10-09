@@ -435,7 +435,6 @@ Transform:
   m_Children:
   - {fileID: 4155839165077622535}
   - {fileID: 8006317485440245861}
-  - {fileID: 8834014997021836840}
   m_Father: {fileID: 1101948116815116915}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6754151915960782124
@@ -563,7 +562,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 8834014997021836840}
   m_Father: {fileID: 843580466399399404}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 180}
 --- !u!114 &3249250163614657099
@@ -1685,32 +1685,32 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 843580466399399404}
+    m_TransformParent: {fileID: 4155839165077622535}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 8550c2e49c4f10c4385d3ff317159dd9,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.847
+      value: 0.15300049
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8550c2e49c4f10c4385d3ff317159dd9,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.438
+      value: 1.5620005
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8550c2e49c4f10c4385d3ff317159dd9,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.153
+      value: 3.8470004
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8550c2e49c4f10c4385d3ff317159dd9,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8550c2e49c4f10c4385d3ff317159dd9,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8550c2e49c4f10c4385d3ff317159dd9,
         type: 3}
@@ -1720,7 +1720,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 8550c2e49c4f10c4385d3ff317159dd9,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: -0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8550c2e49c4f10c4385d3ff317159dd9,
         type: 3}
@@ -1785,6 +1785,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 3101767163757170796}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8550c2e49c4f10c4385d3ff317159dd9,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3896663201447532589}
     - targetCorrespondingSourceObject: {fileID: 8164078558771037576, guid: 8550c2e49c4f10c4385d3ff317159dd9,
         type: 3}
       insertIndex: -1
@@ -1837,6 +1841,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsBaseLink: 0
+--- !u!114 &3896663201447532589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8202015316247944338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ccd67ff65a2a004983229382efb783c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: /mocap/hula/pose
+  NotARobot: 1
+  frequency: 10
+  parentFrameId: KTHTank/mocap
+  parentFrame: {fileID: 4155839165077622535}
 --- !u!4 &8834014997021836840 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8550c2e49c4f10c4385d3ff317159dd9,
