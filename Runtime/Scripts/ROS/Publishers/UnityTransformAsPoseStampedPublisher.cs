@@ -16,12 +16,12 @@ namespace Scripts.ROS.Publishers
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
             ROSMsg.header.frame_id = parentFrameId;
 
-            var pos = parentFrame.InverseTransformPoint(transform.position).To<NED>();
-            var orient = (Quaternion.Inverse(parentFrame.transform.rotation) * transform.rotation).To<NED>();
-
+            var pos = FLU.ConvertFromRUF(parentFrame.InverseTransformPoint(transform.position));
+            var orient = FLU.ConvertFromRUF(Quaternion.Inverse(parentFrame.transform.rotation) * transform.rotation);
+            
             ROSMsg.pose.position.x = pos.x;
-            ROSMsg.pose.position.x = pos.y;
-            ROSMsg.pose.position.x = pos.z;
+            ROSMsg.pose.position.y = pos.y;
+            ROSMsg.pose.position.z = pos.z;
 
             ROSMsg.pose.orientation.x = orient.x;
             ROSMsg.pose.orientation.y = orient.y;
