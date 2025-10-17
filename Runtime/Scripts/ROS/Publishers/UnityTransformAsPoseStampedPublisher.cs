@@ -10,15 +10,15 @@ namespace Scripts.ROS.Publishers
     {
         public string parentFrameId = "";
         public Transform parentFrame;
-        
+
         protected override void UpdateMessage()
         {
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
             ROSMsg.header.frame_id = parentFrameId;
 
-            var pos = FLU.ConvertFromRUF(parentFrame.InverseTransformPoint(transform.position));
-            var orient = FLU.ConvertFromRUF(Quaternion.Inverse(parentFrame.transform.rotation) * transform.rotation);
-            
+            var pos = parentFrame.InverseTransformPoint(transform.position).To<FLU>();
+            var orient = (Quaternion.Inverse(parentFrame.transform.rotation) * transform.rotation).To<FLU>();
+
             ROSMsg.pose.position.x = pos.x;
             ROSMsg.pose.position.y = pos.y;
             ROSMsg.pose.position.z = pos.z;
