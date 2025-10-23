@@ -1,7 +1,8 @@
+using DefaultNamespace;
 using ROS.Core;
 using RosMessageTypes.Geometry;
+using Scripts.ROS.Core;
 using Unity.Robotics.Core;
-using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using UnityEngine;
 
 namespace Scripts.ROS.Publishers
@@ -11,13 +12,15 @@ namespace Scripts.ROS.Publishers
         public string parentFrameId = "";
         public Transform parentFrame;
 
+        public Unity.Robotics.ROSTCPConnector.ROSGeometry.CoordinateSpaceSelection targetSpace = Unity.Robotics.ROSTCPConnector.ROSGeometry.CoordinateSpaceSelection.FLU;
+
         protected override void UpdateMessage()
         {
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
             ROSMsg.header.frame_id = parentFrameId;
 
-            var pos = parentFrame.InverseTransformPoint(transform.position).To<FLU>();
-            var orient = (Quaternion.Inverse(parentFrame.transform.rotation) * transform.rotation).To<FLU>();
+            var pos = parentFrame.InverseTransformPoint(transform.position).To(targetSpace);
+            var orient = (Quaternion.Inverse(parentFrame.transform.rotation) * transform.rotation).To(targetSpace);
 
             ROSMsg.pose.position.x = pos.x;
             ROSMsg.pose.position.y = pos.y;
