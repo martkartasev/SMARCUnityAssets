@@ -32,6 +32,18 @@ public class DomainRandomization : MonoBehaviour
     public float FogDistanceBase = 1000f;
     public float FogDistanceRange = 20f;
 
+    [Header("Water Surface Settings")]
+    [Tooltip("The ocean or water surface in the scene, usually called Ocean")]
+    public WaterSurface WaterSurface;
+    public float DistantWindSpeedBase = 10f;
+    public float DistantWindSpeedRange = 10f;
+    public float LocalWindSpeedBase = 2f;
+    public float LocalWindSpeedRange = 2f;
+    public float CurrentOrientationBase = 0f;
+    public float CurrentOrientationRange = 360f;
+    public float CurrentSpeedBase = 1f;
+    public float CurrentSpeedRange = 1f;
+
     [Header("Cameras")]
     public Transform CamTF;
     [Tooltip("If set, cameras will look at this target after moving")]
@@ -45,7 +57,7 @@ public class DomainRandomization : MonoBehaviour
     public float CameraVerticalPositionRange = 0.5f;
     [Tooltip("Range in degrees for randomizing camera rotations")]
     public float CameraRotationRange = 10f;
-    
+
 
 
 
@@ -53,11 +65,17 @@ public class DomainRandomization : MonoBehaviour
 
     void Start()
     {
-        sunLight = TheSun.GetComponent<Light>();
-        sunTF = TheSun.transform;
-        skyAndFogVolume = SkyAndFogSettings.GetComponent<Volume>();
-        skyAndFogVolume.profile.TryGet<Fog>(out fog);
-        skyAndFogVolume.profile.TryGet<PhysicallyBasedSky>(out sky);
+        if (TheSun != null)
+        {
+            sunLight = TheSun.GetComponent<Light>();
+            sunTF = TheSun.transform;
+        }
+        if(SkyAndFogSettings != null)
+        {
+            skyAndFogVolume = SkyAndFogSettings.GetComponent<Volume>();
+            skyAndFogVolume.profile.TryGet<Fog>(out fog);
+            skyAndFogVolume.profile.TryGet<PhysicallyBasedSky>(out sky);
+        }
     }
 
     public void RandomizeCameras()
@@ -180,11 +198,41 @@ public class DomainRandomization : MonoBehaviour
         }
 
     }
+
+    public void RandomizeWaterSurface()
+    {
+        if (WaterSurface == null) return;
+
+        if (DistantWindSpeedRange > 0f)
+        {
+            float randomDistantWindSpeedOffset = Random.Range(-DistantWindSpeedRange, DistantWindSpeedRange);
+            WaterSurface.largeWindSpeed = Mathf.Max(0f, DistantWindSpeedBase + randomDistantWindSpeedOffset);
+        }
+
+        if (LocalWindSpeedRange > 0f)
+        {
+            float randomLocalWindSpeedOffset = Random.Range(-LocalWindSpeedRange, LocalWindSpeedRange);
+            WaterSurface.ripplesWindSpeed = Mathf.Max(0f, LocalWindSpeedBase + randomLocalWindSpeedOffset);
+        }
+
+        if (CurrentOrientationRange > 0f)
+        {
+            float randomCurrentOrientationOffset = Random.Range(-CurrentOrientationRange, CurrentOrientationRange);
+            WaterSurface.largeOrientationValue = (CurrentOrientationBase + randomCurrentOrientationOffset) % 360f;
+        }
+
+        if (CurrentSpeedRange > 0f)
+        {
+            float randomCurrentSpeedOffset = Random.Range(-CurrentSpeedRange, CurrentSpeedRange);
+            WaterSurface.largeCurrentSpeedValue = Mathf.Max(0f, CurrentSpeedBase + randomCurrentSpeedOffset);
+        }
+    }
     
     public void RandomizeAll()
     {
         RandomizeSun();
         RandomizeSkyAndFog();
+        RandomizeWaterSurface();
         RandomizeCameras();
     }
 
