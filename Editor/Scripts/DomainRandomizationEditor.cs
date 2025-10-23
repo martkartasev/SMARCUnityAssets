@@ -13,6 +13,11 @@ namespace Editor.Scripts
         {
             container = (DomainRandomization) target;
             DrawDefaultInspector();
+            
+            if (GUILayout.Button("Randomize All"))
+            {
+                container.RandomizeAll();
+            }
 
             if (GUILayout.Button("Randomize Sun"))
             {
@@ -29,10 +34,6 @@ namespace Editor.Scripts
                 container.RandomizeCameras();
             }
 
-            if (GUILayout.Button("Randomize All"))
-            {
-                container.RandomizeAll();
-            }
 
             if (GUILayout.Button("Randomize Water Surface"))
             {
