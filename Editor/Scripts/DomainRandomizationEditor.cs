@@ -33,6 +33,11 @@ namespace Editor.Scripts
             {
                 container.RandomizeAll();
             }
+
+            if (GUILayout.Button("Randomize Water Surface"))
+            {
+                container.RandomizeWaterSurface();
+            }
         }
     }
 }
