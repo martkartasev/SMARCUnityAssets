@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: VisualEnvironment
   m_EditorClassIdentifier: 
   active: 1
+  m_Version: 1
   skyType:
     m_OverrideState: 1
     m_Value: 4
@@ -36,14 +37,13 @@ MonoBehaviour:
     m_Value: {x: 0, y: -6378.1, z: 0}
   windOrientation:
     m_OverrideState: 1
-    m_Value: 136
+    m_Value: 74
   windSpeed:
     m_OverrideState: 1
     m_Value: 1.36
   fogType:
     m_OverrideState: 1
     m_Value: 0
-  m_Version: 1
 --- !u!114 &-4477917316242744625
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -87,6 +87,16 @@ MonoBehaviour:
   includeSunInBaking:
     m_OverrideState: 0
     m_Value: 0
+  m_SkyVersion: 3
+  m_ObsoleteEarthPreset:
+    m_OverrideState: 0
+    m_Value: 1
+  planetaryRadius:
+    m_OverrideState: 0
+    m_Value: 6378100
+  planetCenterPosition:
+    m_OverrideState: 0
+    m_Value: {x: 0, y: -6378100, z: 0}
   type:
     m_OverrideState: 0
     m_Value: 1
@@ -120,7 +130,7 @@ MonoBehaviour:
     m_Value: 0
   aerosolTint:
     m_OverrideState: 0
-    m_Value: {r: 0.9, g: 0.9, b: 0.9, a: 1}
+    m_Value: {r: 0.55098796, g: 0.515187, b: 0.35015112, a: 1}
   aerosolMaximumAltitude:
     m_OverrideState: 0
     m_Value: 8289.296
@@ -168,26 +178,16 @@ MonoBehaviour:
     m_Value: 1
   alphaMultiplier:
     m_OverrideState: 0
-    m_Value: 1
+    m_Value: 0.73
   horizonTint:
     m_OverrideState: 0
-    m_Value: {r: 1, g: 1, b: 1, a: 1}
+    m_Value: {r: 0.6753837, g: 0.3213461, b: 0.3213461, a: 1}
   zenithTint:
     m_OverrideState: 0
     m_Value: {r: 1, g: 1, b: 1, a: 1}
   horizonZenithShift:
     m_OverrideState: 0
     m_Value: 0
-  m_SkyVersion: 3
-  m_ObsoleteEarthPreset:
-    m_OverrideState: 0
-    m_Value: 1
-  planetaryRadius:
-    m_OverrideState: 0
-    m_Value: 6378100
-  planetCenterPosition:
-    m_OverrideState: 0
-    m_Value: {x: 0, y: -6378100, z: 0}
 --- !u!114 &-2944945518175945530
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -235,14 +235,14 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 50
   meanFreePath:
-    m_OverrideState: 0
-    m_Value: 400
-  enableVolumetricFog:
     m_OverrideState: 1
+    m_Value: 1000
+  enableVolumetricFog:
+    m_OverrideState: 0
     m_Value: 1
   albedo:
     m_OverrideState: 0
-    m_Value: {r: 1, g: 1, b: 1, a: 1}
+    m_Value: {r: 0.4846256, g: 0.68872297, b: 0.39029288, a: 1}
   globalLightProbeDimmer:
     m_OverrideState: 0
     m_Value: 1

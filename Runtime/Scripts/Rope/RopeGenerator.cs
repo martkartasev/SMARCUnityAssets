@@ -6,6 +6,10 @@ namespace Rope
 {
     public class RopeGenerator : MonoBehaviour
     {
+        [Header("General Rope Settings")]
+        [Tooltip("Layer name for the rope objects, make sure this layer exists in the project")]
+        public string RopeLayerName = "Rope";
+
         [Header("Prefab of the rope parts")]
         public GameObject RopeLinkPrefab;
         public GameObject BuoyPrefab;
@@ -135,6 +139,13 @@ namespace Rope
             if (RopeContainer == null)
             {
                 RopeContainer = new GameObject(containerName);
+                int ropeLayer = LayerMask.NameToLayer(RopeLayerName);
+                if (ropeLayer == -1)
+                {
+                    Debug.LogWarning($"RopeGenerator: Layer named \"{RopeLayerName}\" not found. Using default layer 0.");
+                    ropeLayer = 0;
+                }
+                RopeContainer.layer = ropeLayer;
                 RopeContainer.transform.SetParent(gameObject.transform);
                 RopeContainer.transform.SetPositionAndRotation(VehicleRopeLink.transform.position, VehicleRopeLink.transform.rotation);
                 var ropetf = RopeContainer.AddComponent<ROSTransformTreePublisher>();

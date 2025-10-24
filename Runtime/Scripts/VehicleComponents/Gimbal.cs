@@ -2,7 +2,17 @@ using UnityEngine;
 
 public class Gimbal : MonoBehaviour
 {
+    void Start()
+    {
+        DoGimbal(allowLarge: true);
+    }
+
     void LateUpdate()
+    {
+        DoGimbal(allowLarge: false);
+    }
+
+    void DoGimbal(bool allowLarge)
     {
         if (transform.parent == null)
             return;
@@ -20,7 +30,29 @@ public class Gimbal : MonoBehaviour
         Vector3 forward = Vector3.down;
         Vector3 up = yawOnly * Vector3.forward;
 
-        // 3) Apply rotation
-        transform.rotation = Quaternion.LookRotation(forward, up);
+        // 3) Apply rotation with threshold check
+        Quaternion newRotation = Quaternion.LookRotation(forward, up);
+        
+        // Could be useful to do once at the start
+        if (allowLarge)
+        {
+            transform.rotation = newRotation;
+            return;
+        }
+
+        // maximum allowed rotation change in degrees (adjust this variable as needed)
+        float maxAngleDegrees = 30f;
+
+        float angleDelta = Quaternion.Angle(transform.rotation, newRotation);
+
+        if (angleDelta <= maxAngleDegrees)
+        {
+            transform.rotation = newRotation;
+        }
+        else
+        {
+            Debug.LogWarning($"Gimbal rotation change of {angleDelta}° exceeds the maximum allowed {maxAngleDegrees}°. Rotation not applied.");
+        }
+
     }
 }
