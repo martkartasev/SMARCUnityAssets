@@ -48,6 +48,8 @@ public class DomainRandomization : MonoBehaviour
     public Transform CamTF;
     [Tooltip("If set, cameras will look at this target after moving")]
     public Transform LookAtTarget;
+    [Tooltip("If true, cameras will be centered horizontally on the target position before applying random offsets")]
+    public bool CenterCamerasHorizontallyOnTarget = true;
     [Tooltip("Randomize a relative offset to look at around the target")]
     public float LookAtTargetOffsetHorizontalRange = 3f;
     [Tooltip("Randomize a relative offset to look at around the target")]
@@ -105,7 +107,12 @@ public class DomainRandomization : MonoBehaviour
             positionOffset += randomVerticalOffset;
         }
 
-        CamTF.localPosition = positionOffset;
+        Vector3 centerPosition = transform.position;
+        if (CenterCamerasHorizontallyOnTarget && LookAtTarget != null)
+        {
+            centerPosition = new(LookAtTarget.position.x, transform.position.y, LookAtTarget.position.z);
+        }
+        CamTF.position = centerPosition + positionOffset;
 
         // Randomize rotation
         if (CameraRotationRange > 0f)
@@ -241,7 +248,12 @@ public class DomainRandomization : MonoBehaviour
         if (CamTF != null)
         {
             Gizmos.color = Color.cyan;
-            Gizmos.DrawWireCube(transform.position, new Vector3(
+            Vector3 center = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+            if (LookAtTarget != null && CenterCamerasHorizontallyOnTarget)
+            {
+                center = new Vector3(LookAtTarget.position.x, transform.position.y, LookAtTarget.position.z);
+            }
+            Gizmos.DrawWireCube(center, new Vector3(
                 CameraHorizontalPositionRange * 2f,
                 CameraVerticalPositionRange * 2f,
                 CameraHorizontalPositionRange * 2f
