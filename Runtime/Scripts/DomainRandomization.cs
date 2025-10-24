@@ -1,3 +1,6 @@
+using System.IO;
+using SmarcGUI;
+using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
@@ -46,6 +49,9 @@ public class DomainRandomization : MonoBehaviour
 
     [Header("Cameras")]
     public Transform CamTF;
+    public float WaitForExposure = 2f;
+    public int NumShotsPerExposure = 10;
+    Camera[] cams;
     [Tooltip("If set, cameras will look at this target after moving")]
     public Transform LookAtTarget;
     [Tooltip("If true, cameras will be centered horizontally on the target position before applying random offsets")]
@@ -59,25 +65,161 @@ public class DomainRandomization : MonoBehaviour
     public float CameraVerticalPositionRange = 0.5f;
     [Tooltip("Range in degrees for randomizing camera rotations")]
     public float CameraRotationRange = 10f;
+    [Tooltip("Range in degrees for randomizing camera field of view")]
+    public float CameraFOVBase = 80f;
+    public float CameraFOVRange = 20f;
 
 
+    [Header("Files")]
+    public int NumImages = 100;
+    int shotIndex = 0;
+    string sessionPath;
+    StreamWriter infoWriter;
 
 
-
-
-    void Start()
+    void SetComponents()
     {
         if (TheSun != null)
         {
             sunLight = TheSun.GetComponent<Light>();
             sunTF = TheSun.transform;
         }
-        if(SkyAndFogSettings != null)
+        if (SkyAndFogSettings != null)
         {
             skyAndFogVolume = SkyAndFogSettings.GetComponent<Volume>();
-            skyAndFogVolume.profile.TryGet<Fog>(out fog);
-            skyAndFogVolume.profile.TryGet<PhysicallyBasedSky>(out sky);
+            skyAndFogVolume.profile.TryGet(out fog);
+            skyAndFogVolume.profile.TryGet(out sky);
         }
+        cams = CamTF.GetComponentsInChildren<Camera>();
+    }
+
+    void Start()
+    {
+        SetComponents();
+        // for each camera under the CamTF object, set the render target to a new texture with the same resolution as the camera
+        foreach (Camera cam in cams)
+        {
+            RenderTexture rt = new(cam.pixelWidth, cam.pixelHeight, 24);
+            cam.targetTexture = rt;
+        }
+        string date = System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        string mainStoragePath = Path.Combine(GUIState.GetStoragePath(), "DomainRandomization");
+        sessionPath = Path.Combine(mainStoragePath, date);
+        Directory.CreateDirectory(sessionPath);
+
+        string infoPath = Path.Combine(sessionPath, "info.csv");
+        // create CSV file with header
+        infoWriter = new StreamWriter(infoPath);
+        infoWriter.WriteLine("ShotIndex,CamFOV,CamPositionX,CamPositionY,CamPositionZ,CamOrientationW,CamOrientationX,CamOrientationY,CamOrientationZ,TargetPositionX,TargetPositionY,TargetPositionZ,TargetOrientationW,CamOrientationX,CamOrientationY");
+        
+        StartCoroutine(GenerateLoop());
+    }
+
+    System.Collections.IEnumerator GenerateLoop()
+    {
+        while (shotIndex < NumImages)
+        {
+            RandomizeAll();
+            yield return new WaitForSeconds(WaitForExposure);
+            for (int i = 0; i < NumShotsPerExposure; i++)
+            {
+                SaveImages();
+                RandomizeAllExceptSun();
+                yield return new WaitForSeconds(0.5f);
+            }
+        }
+
+        infoWriter.Close();
+        enabled = false;
+        Debug.Log($"Domain randomization session complete. Images and info saved to {sessionPath}");
+    }
+    
+    void Update()
+    {
+        // gotta do this so the cameras adjust their auto-exposure all the time
+        foreach(Camera cam in cams)
+        {
+            if (cam.targetTexture != null)
+            {
+                cam.Render();
+            }
+        }
+    }
+
+
+    public void RandomizeAll()
+    {
+        RandomizeSun();
+        RandomizeSkyAndFog();
+        RandomizeWaterSurface();
+        RandomizeCameras();
+        Debug.Log("Randomized all components for shot " + shotIndex);
+    }
+
+    public void RandomizeAllExceptSun()
+    {
+        RandomizeSkyAndFog();
+        RandomizeWaterSurface();
+        RandomizeCameras();
+        Debug.Log("Randomized all components except sun for shot " + shotIndex);
+    }
+
+    void SaveImages()
+    {
+        // for each camera under the CamTF object, save the render target to a PNG file
+        foreach (Camera cam in cams)
+        {
+            RenderTexture currentRT = RenderTexture.active;
+            RenderTexture.active = cam.targetTexture;
+
+            cam.Render();
+
+            Texture2D image = new(cam.targetTexture.width, cam.targetTexture.height);
+            image.ReadPixels(new Rect(0, 0, cam.targetTexture.width, cam.targetTexture.height), 0, 0);
+            image.Apply();
+
+            byte[] bytes = image.EncodeToPNG();
+            File.WriteAllBytes($"{sessionPath}/{shotIndex}_{cam.name}.png", bytes);
+
+            RenderTexture.active = currentRT;
+        }
+        infoWriter.Write($"{shotIndex},");
+
+        infoWriter.Write($"{cams[0].fieldOfView},");
+
+        var camTFENU = CamTF.transform.To<ENU>();
+        infoWriter.Write($"{camTFENU.translation.x},");
+        infoWriter.Write($"{camTFENU.translation.y},");
+        infoWriter.Write($"{camTFENU.translation.z},");
+        infoWriter.Write($"{camTFENU.rotation.w},");
+        infoWriter.Write($"{camTFENU.rotation.x},");
+        infoWriter.Write($"{camTFENU.rotation.y},");
+        infoWriter.Write($"{camTFENU.rotation.z},");
+
+        if (LookAtTarget != null)
+        {
+            var targetTFENU = LookAtTarget.transform.To<ENU>();
+            infoWriter.Write($"{targetTFENU.translation.x},");
+            infoWriter.Write($"{targetTFENU.translation.y},");
+            infoWriter.Write($"{targetTFENU.translation.z},");
+            infoWriter.Write($"{targetTFENU.rotation.w},");
+            infoWriter.Write($"{targetTFENU.rotation.x},");
+            infoWriter.Write($"{targetTFENU.rotation.y},");
+            infoWriter.Write($"{targetTFENU.rotation.z},");
+        }
+        else
+        {
+            infoWriter.Write("-,");
+            infoWriter.Write("-,");
+            infoWriter.Write("-,");
+            infoWriter.Write("-,");
+            infoWriter.Write("-,");
+            infoWriter.Write("-,");
+            infoWriter.Write("-,"); 
+        }
+        infoWriter.WriteLine();
+        shotIndex++;
+        Debug.Log("Saved images and info for shot " + shotIndex);
     }
 
     public void RandomizeCameras()
@@ -138,7 +280,7 @@ public class DomainRandomization : MonoBehaviour
                     Random.Range(-LookAtTargetOffsetHorizontalRange, LookAtTargetOffsetHorizontalRange)
                 );
             }
-            if (LookAtTargetOffsetVerticalRange > 0f)   
+            if (LookAtTargetOffsetVerticalRange > 0f)
             {
                 lookAt += new Vector3(
                     0f,
@@ -149,14 +291,21 @@ public class DomainRandomization : MonoBehaviour
             CamTF.LookAt(lookAt);
         }
         
+        // Randomize FOV
+        if (CameraFOVRange > 0f)
+        {
+            float randomFOVOffset = Random.Range(-CameraFOVRange, CameraFOVRange);
+            foreach (Camera cam in cams)
+            {
+                cam.fieldOfView = CameraFOVBase + randomFOVOffset;
+            }
+        }
+        
     }
 
     public void RandomizeSkyAndFog()
     {
-        if (skyAndFogVolume == null)
-        {
-            Start();
-        }
+        if (skyAndFogVolume == null) SetComponents();
 
         if (fog != null && FogDistanceRange > 0f)
         {
@@ -173,41 +322,45 @@ public class DomainRandomization : MonoBehaviour
 
     public void RandomizeSun()
     {
-        if (sunLight == null || sunTF == null)
+        if (sunLight == null || sunTF == null) SetComponents();
+
+        if (sunTF != null)
         {
-            Start();
+            // Randomize sun rotation
+            if (SunRotationHorizontalRange > 0f || SunRotationVerticalRange > 0f)
+            {
+                float randomY = Random.Range(-SunRotationHorizontalRange, SunRotationHorizontalRange);
+                float randomX = Random.Range(-SunRotationVerticalRange, SunRotationVerticalRange);
+                float newX = SunRotationVerticalBase + randomX;
+                newX = Mathf.Max(newX, 0f);
+                float newY = SunRotationHorizontalBase + randomY;
+
+                sunTF.rotation = Quaternion.Euler(newX, newY, 0f);
+            }
         }
 
-        // Randomize sun rotation
-        if (SunRotationHorizontalRange > 0f || SunRotationVerticalRange > 0f)
+        if (sunLight != null)
         {
-            float randomY = Random.Range(-SunRotationHorizontalRange, SunRotationHorizontalRange);
-            float randomX = Random.Range(-SunRotationVerticalRange, SunRotationVerticalRange);
-            float newX = SunRotationVerticalBase + randomX;
-            newX = Mathf.Max(newX, 0f);
-            float newY = SunRotationHorizontalBase + randomY;
+            if (SunEmissionTemperatureRange > 0f)
+            {
+                // Randomize sun temperature
+                float randomTemperatureOffset = Random.Range(-SunEmissionTemperatureRange, SunEmissionTemperatureRange);
+                sunLight.colorTemperature = SunEmissionTemperatureBase + randomTemperatureOffset;
+            }
 
-            sunTF.rotation = Quaternion.Euler(newX, newY, 0f);
-        }
-
-        if (SunEmissionTemperatureRange > 0f)
-        {
-            // Randomize sun temperature
-            float randomTemperatureOffset = Random.Range(-SunEmissionTemperatureRange, SunEmissionTemperatureRange);
-            sunLight.colorTemperature = SunEmissionTemperatureBase + randomTemperatureOffset;
-        }
-
-        if (SunIntensityThousandsRange > 0f)
-        {
-            // Randomize sun intensity
-            float randomIntensityOffset = Random.Range(-SunIntensityThousandsRange * 1000f, SunIntensityThousandsRange * 1000f);
-            sunLight.intensity = SunIntensityThousandsBase * 1000f + randomIntensityOffset;
+            if (SunIntensityThousandsRange > 0f)
+            {
+                // Randomize sun intensity
+                float randomIntensityOffset = Random.Range(-SunIntensityThousandsRange * 1000f, SunIntensityThousandsRange * 1000f);
+                sunLight.intensity = SunIntensityThousandsBase * 1000f + randomIntensityOffset;
+            }
         }
 
     }
 
     public void RandomizeWaterSurface()
     {
+        if (WaterSurface == null) SetComponents();
         if (WaterSurface == null) return;
 
         if (DistantWindSpeedRange > 0f)
@@ -235,13 +388,7 @@ public class DomainRandomization : MonoBehaviour
         }
     }
     
-    public void RandomizeAll()
-    {
-        RandomizeSun();
-        RandomizeSkyAndFog();
-        RandomizeWaterSurface();
-        RandomizeCameras();
-    }
+
 
     void OnDrawGizmos()
     {
