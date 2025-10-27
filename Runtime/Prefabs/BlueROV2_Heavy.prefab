@@ -25186,6 +25186,7 @@ GameObject:
   - component: {fileID: 6809330939912970453}
   - component: {fileID: 8471916112562930495}
   - component: {fileID: 1112454202940184983}
+  - component: {fileID: 8461225942027393360}
   m_Layer: 0
   m_Name: BlueROV2_Heavy
   m_TagString: robot
@@ -25248,6 +25249,39 @@ MonoBehaviour:
   HorizontalRightBackProp: {fileID: 675016981600809709}
   HorizontalLeftFrontProp: {fileID: 3223508980979053620}
   HorizontalLeftBackProp: {fileID: 2893784281425625186}
+--- !u!114 &8461225942027393360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4704691646545008750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e3c7587d53b454488b52174f825e77d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: mavros/rc/in
+  NotARobot: 0
+  expectedFrequency: 1
+  resetting: 0
+  receivedFrequency: 0
+  ReceivedFirstMessage: 0
+  P1: {fileID: 4065585495864902325}
+  P2: {fileID: 250938659031566097}
+  P3: {fileID: 8002379997530137647}
+  P4: {fileID: 5497531099055037943}
+  P5: {fileID: 8061982494456601015}
+  P6: {fileID: 3223508980979053620}
+  P7: {fileID: 675016981600809709}
+  P8: {fileID: 2893784281425625186}
+  PropRcMin: 1400
+  PropRcMax: 1600
+  PropMaxRPM: 500
+  CameraTiltRcMin: 1100
+  CameraTiltRcMax: 1900
+  CameraTiltChannel: 14
+  CameraTiltHinge: {fileID: 3072044018038567128}
 --- !u!1 &4710311984236141670
 GameObject:
   m_ObjectHideFlags: 0
