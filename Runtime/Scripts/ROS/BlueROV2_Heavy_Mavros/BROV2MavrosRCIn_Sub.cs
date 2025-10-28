@@ -11,7 +11,7 @@ namespace Brov2.Mavros
         [Tooltip("Match the propellers to the RC channels as per your configuration.")]
         public Propeller P1; 
         public Propeller P2, P3, P4, P5, P6, P7, P8;
-        Propeller[] props;
+        public Propeller[] props;
 
         [Tooltip("Map RC value to RPM. Adjust these values based on your RC transmitter settings.")]
         public int PropRcMin = 1400;

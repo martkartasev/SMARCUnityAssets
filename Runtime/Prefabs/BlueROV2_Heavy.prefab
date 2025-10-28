@@ -184,6 +184,7 @@ GameObject:
   - component: {fileID: 4854871456452310804}
   - component: {fileID: 5688580052582734387}
   - component: {fileID: 585635162277522008}
+  - component: {fileID: 1919135346297278044}
   m_Layer: 0
   m_Name: camera
   m_TagString: Untagged
@@ -199,12 +200,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 74714399922721072}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: -0.1141, z: 0.0486}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5095159921187141153}
+  m_Father: {fileID: 7249212120045731704}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &4854871456452310804
 Camera:
@@ -224,7 +225,7 @@ Camera:
   m_ShutterSpeed: 0.005
   m_Aperture: 16
   m_FocusDistance: 10
-  m_FocalLength: 50
+  m_FocalLength: 20.784609
   m_BladeCount: 5
   m_Curvature: {x: 2, y: 11}
   m_BarrelClipping: 0.25
@@ -239,7 +240,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 57
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -269,6 +270,53 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23c1ce4fb46143f46bc5cb5224c934f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Version: 9
+  m_ObsoleteRenderingPath: 0
+  m_ObsoleteFrameSettings:
+    overrides: 0
+    enableShadow: 0
+    enableContactShadows: 0
+    enableShadowMask: 0
+    enableSSR: 0
+    enableSSAO: 0
+    enableSubsurfaceScattering: 0
+    enableTransmission: 0
+    enableAtmosphericScattering: 0
+    enableVolumetrics: 0
+    enableReprojectionForVolumetrics: 0
+    enableLightLayers: 0
+    enableExposureControl: 1
+    diffuseGlobalDimmer: 0
+    specularGlobalDimmer: 0
+    shaderLitMode: 0
+    enableDepthPrepassWithDeferredRendering: 0
+    enableTransparentPrepass: 0
+    enableMotionVectors: 0
+    enableObjectMotionVectors: 0
+    enableDecals: 0
+    enableRoughRefraction: 0
+    enableTransparentPostpass: 0
+    enableDistortion: 0
+    enablePostprocess: 0
+    enableOpaqueObjects: 0
+    enableTransparentObjects: 0
+    enableRealtimePlanarReflection: 0
+    enableMSAA: 0
+    enableAsyncCompute: 0
+    runLightListAsync: 0
+    runSSRAsync: 0
+    runSSAOAsync: 0
+    runContactShadowsAsync: 0
+    runVolumeVoxelizationAsync: 0
+    lightLoopSettings:
+      overrides: 0
+      enableDeferredTileAndCluster: 0
+      enableComputeLightEvaluation: 0
+      enableComputeLightVariants: 0
+      enableComputeMaterialVariants: 0
+      enableFptlForForwardOpaque: 0
+      enableBigTilePrepass: 0
+      isFptlEnabled: 0
   clearColorMode: 0
   backgroundColorHDR: {r: 0.025, g: 0.07, b: 0.19, a: 0}
   clearDepth: 1
@@ -349,53 +397,6 @@ MonoBehaviour:
       data1: 0
       data2: 0
   defaultFrameSettings: 0
-  m_Version: 9
-  m_ObsoleteRenderingPath: 0
-  m_ObsoleteFrameSettings:
-    overrides: 0
-    enableShadow: 0
-    enableContactShadows: 0
-    enableShadowMask: 0
-    enableSSR: 0
-    enableSSAO: 0
-    enableSubsurfaceScattering: 0
-    enableTransmission: 0
-    enableAtmosphericScattering: 0
-    enableVolumetrics: 0
-    enableReprojectionForVolumetrics: 0
-    enableLightLayers: 0
-    enableExposureControl: 1
-    diffuseGlobalDimmer: 0
-    specularGlobalDimmer: 0
-    shaderLitMode: 0
-    enableDepthPrepassWithDeferredRendering: 0
-    enableTransparentPrepass: 0
-    enableMotionVectors: 0
-    enableObjectMotionVectors: 0
-    enableDecals: 0
-    enableRoughRefraction: 0
-    enableTransparentPostpass: 0
-    enableDistortion: 0
-    enablePostprocess: 0
-    enableOpaqueObjects: 0
-    enableTransparentObjects: 0
-    enableRealtimePlanarReflection: 0
-    enableMSAA: 0
-    enableAsyncCompute: 0
-    runLightListAsync: 0
-    runSSRAsync: 0
-    runSSAOAsync: 0
-    runContactShadowsAsync: 0
-    runVolumeVoxelizationAsync: 0
-    lightLoopSettings:
-      overrides: 0
-      enableDeferredTileAndCluster: 0
-      enableComputeLightEvaluation: 0
-      enableComputeLightVariants: 0
-      enableComputeMaterialVariants: 0
-      enableFptlForForwardOpaque: 0
-      enableBigTilePrepass: 0
-      isFptlEnabled: 0
 --- !u!114 &585635162277522008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -415,7 +416,7 @@ MonoBehaviour:
   pitch: 0
   yaw: 0
   FixedRotation: 0
-  frequency: 10
+  frequency: 30
   hasNewData: 0
   textureWidth: 640
   textureHeight: 480
@@ -425,6 +426,24 @@ MonoBehaviour:
   viewY: 30
   viewHeight: 500
   viewWidth: 500
+--- !u!114 &1919135346297278044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74714399922721072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b6639050ad5a83f6a4f0de5e9d7e935, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: camera/image_raw
+  NotARobot: 0
+  frequency: 30
+  ignoreSensorState: 0
+  flipVertically: 1
+  flipHorizontally: 1
 --- !u!1 &76303463074729384
 GameObject:
   m_ObjectHideFlags: 0
@@ -4774,6 +4793,79 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &988359347233684188
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7319454159808575566}
+  - component: {fileID: 1043074896692657694}
+  - component: {fileID: 7633897562105626458}
+  m_Layer: 0
+  m_Name: PressureDepth
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7319454159808575566
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 988359347233684188}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7249212120045731704}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1043074896692657694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 988359347233684188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bf5bfc0318431217ac77f75561384a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  linkName: base_link
+  retryUntilSuccess: 1
+  rotateForROSCamera: 0
+  roll: 0
+  pitch: 0
+  yaw: 0
+  FixedRotation: 0
+  frequency: 10
+  hasNewData: 0
+  maxDepth: 99
+  includeAtmosphericPressure: 0
+  pressure: 0
+--- !u!114 &7633897562105626458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 988359347233684188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f360f4e5a062ee9d9d2906381193552, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: mavros/imu/static_pressure
+  NotARobot: 0
+  frequency: 10
+  ignoreSensorState: 0
 --- !u!1 &992365045910069994
 GameObject:
   m_ObjectHideFlags: 0
@@ -17181,7 +17273,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.000001
-  m_ParentAnchorPosition: {x: -0.098736465, y: -0.0676978, z: -0.35968438}
+  m_ParentAnchorPosition: {x: -0.098736525, y: -0.0676978, z: -0.35968438}
   m_ParentAnchorRotation: {x: -0.65328145, y: -0.27059817, z: 0.27059817, w: -0.65328145}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
@@ -17612,6 +17704,8 @@ Transform:
   m_Children:
   - {fileID: 6231305391002315505}
   - {fileID: 354418766373460349}
+  - {fileID: 7319454159808575566}
+  - {fileID: 335896236888343836}
   m_Father: {fileID: 6809330939912970453}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3443184199207364601
@@ -18853,7 +18947,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.000001
-  m_ParentAnchorPosition: {x: 0.21833771, y: -0.0038000047, z: -0.0899}
+  m_ParentAnchorPosition: {x: 0.21833777, y: -0.0038000047, z: -0.0899}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
@@ -23381,7 +23475,6 @@ Transform:
   - {fileID: 4838518132097645536}
   - {fileID: 8136650685954073715}
   - {fileID: 5582781825752656435}
-  - {fileID: 335896236888343836}
   m_Father: {fileID: 6809330939912970453}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4427994809854618926
@@ -25298,6 +25391,8 @@ GameObject:
   - component: {fileID: 8471916112562930495}
   - component: {fileID: 1112454202940184983}
   - component: {fileID: 8461225942027393360}
+  - component: {fileID: 6055025780679724049}
+  - component: {fileID: 1425766143663521469}
   m_Layer: 0
   m_Name: BlueROV2_Heavy
   m_TagString: robot
@@ -25387,6 +25482,7 @@ MonoBehaviour:
   P6: {fileID: 3223508980979053620}
   P7: {fileID: 675016981600809709}
   P8: {fileID: 2893784281425625186}
+  props: []
   PropRcMin: 1400
   PropRcMax: 1600
   PropMaxRPM: 500
@@ -25394,6 +25490,36 @@ MonoBehaviour:
   CameraTiltRcMax: 1900
   CameraTiltChannel: 14
   CameraTiltHinge: {fileID: 3072044018038567128}
+--- !u!114 &6055025780679724049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4704691646545008750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 910f03e7c2780739788846c58f5d8142, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: mavros/rc/out
+  NotARobot: 0
+  frequency: 10
+--- !u!114 &1425766143663521469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4704691646545008750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e05042af8a9dbdfae802f203c4b0cf04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: odom_gt
+  NotARobot: 0
+  frequency: 50
 --- !u!1 &4710311984236141670
 GameObject:
   m_ObjectHideFlags: 0
@@ -39160,6 +39286,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6231305391002315505}
   - component: {fileID: 916654225711476489}
+  - component: {fileID: 510217337742965952}
   m_Layer: 0
   m_Name: IMU
   m_TagString: Untagged
@@ -39239,6 +39366,23 @@ MonoBehaviour:
   - 0
   - 0
   - 0
+--- !u!114 &510217337742965952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7413482366170832541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32ccbfb20e694c726875aa7c68c0bca7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: mavros/imu/data_raw
+  NotARobot: 0
+  frequency: 10
+  ignoreSensorState: 0
+  useNED: 0
 --- !u!1 &7426440725665643109
 GameObject:
   m_ObjectHideFlags: 0
@@ -39594,6 +39738,7 @@ GameObject:
   - component: {fileID: 354418766373460349}
   - component: {fileID: 1104876162607832489}
   - component: {fileID: 4538324647178523085}
+  - component: {fileID: 9172725899257080473}
   m_Layer: 0
   m_Name: 3DSonar_Navigation
   m_TagString: Untagged
@@ -39638,10 +39783,10 @@ MonoBehaviour:
   frequency: 5
   hasNewData: 0
   Type: 0
-  NumRaysPerBeam: 50
+  NumRaysPerBeam: 25
   BeamBreadthDeg: 40
-  NumBeams: 50
-  MaxRange: 15
+  NumBeams: 25
+  MaxRange: 3
   BeamBreadth3DecibelsDeg: 60
   TiltAngleDeg: 0
   FLSFOVDeg: 90
@@ -39679,6 +39824,22 @@ MonoBehaviour:
   HitsSize: 0.01
   HitsLifetime: 1
   MaxParticlesMultiplier: 100
+--- !u!114 &9172725899257080473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7516588455049158164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c404bcc3ca14f048dbe0147fad1cebc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: sonar/point_cloud
+  NotARobot: 0
+  frequency: 10
+  ignoreSensorState: 0
 --- !u!1 &7521838679715988434
 GameObject:
   m_ObjectHideFlags: 0
@@ -41224,7 +41385,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.000001
-  m_ParentAnchorPosition: {x: -0.21691126, y: -0.0038648993, z: -0.32946587}
+  m_ParentAnchorPosition: {x: -0.2169112, y: -0.0038648993, z: -0.32946587}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
@@ -43918,7 +44079,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.000001
-  m_ParentAnchorPosition: {x: 0.21833771, y: -0.004059896, z: -0.33021426}
+  m_ParentAnchorPosition: {x: 0.21833777, y: -0.004059896, z: -0.33021426}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
@@ -48594,7 +48755,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.000001
-  m_ParentAnchorPosition: {x: -0.21691126, y: -0.0038648993, z: -0.0898}
+  m_ParentAnchorPosition: {x: -0.21691132, y: -0.0038648993, z: -0.0898}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
