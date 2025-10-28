@@ -144,7 +144,7 @@ namespace GameUI
                     var positions = new List<Vector3>();
                     positions.Add(sonar.transform.position);
 
-                    for (int i=0; i<sonar.TotalRayCount; i+=2)
+                    for (int i=0; i<sonar.SonarHits.Length-1; i+=2)
                     {
                         var hit0 = sonar.SonarHits[i].Hit.point;
                         if (hit0 == Vector3.zero) positions.Add(sonar.transform.position);
