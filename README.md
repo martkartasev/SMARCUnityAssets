@@ -1,17 +1,47 @@
-# SMARC Unity Assets
+# SMARC Assets
 This is a package containing all of the SMARC Unity assets and scripts including vehicles, dynamics, sensors and more. 
 
 ## Quick start
-If you:
-- Are new to Unity
-- Want to avoid installation
-- Just want a quick demo of the project
 
-We suggest starting with the pre-configured project: [Standard](https://github.com/smarc-project/SMARCUnityStandard)
+### Independently of SMaRC2
+```
+cd anywhere
+git clone git@github.com:smarc-project/SMARCUnity.git
+git clone git@github.com:smarc-project/SMARCAssets.git
+```
 
-If you wish to add higher graphical fidelity, [enable HDRP](Runtime/HDRP/README.md) 
+### As part of SMaRC2
+You can do the above, OR this:
+```
+cd smarc2
+git submodule update --remote --init simulation/SMARCUnity
+git submodule update --remote --init simulation/SMARCAssets
+```
+
+### Common for both:
+Run Unity Hub:
+  - Open Project: Navigate to SmarcUnity
+  - Run SmarcUnity
+  - Open a scene under `Assets/Scenes/`
+  - Play
 
 You can find more detailed instructions on using all available vehicles, sensors, connections, UIs etc. [here](./Documentation/README.md).
+
+
+## How to cite
+```
+@INPROCEEDINGS{11139391,
+  author={Kartašev, Mart and Dörner, David and Özkahraman, Özer and Ögren, Petter and Stenius, Ivan and Folkesson, John},
+  booktitle={2025 Symposium on Maritime Informatics and Robotics (MARIS)}, 
+  title={SMaRCSim: Maritime Robotics Simulation Modules}, 
+  year={2025},
+  volume={},
+  number={},
+  pages={1-4},
+  keywords={Learning systems;Heuristic algorithms;Games;Planning;Vehicle dynamics;Informatics;Robots;Engines;Physics;Testing;Simulation;multi-domain;AUVs;learning-based methods;mission-planning},
+  doi={10.1109/MARIS64137.2025.11139391}}
+```
+
 
 ## Help!
 If at any point, you needed help, got the help, and the help was not about using Unity (Good example:"How do I make my vehicle buoyant?". Bad example: "How do I move this object in the editor?"), please [open an issue in github](https://github.com/smarc-project/SMARCUnityAssets/issues) (and tag it with "Documentation" if you can). 
