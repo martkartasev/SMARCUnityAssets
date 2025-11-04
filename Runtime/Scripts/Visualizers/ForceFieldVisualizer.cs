@@ -4,7 +4,7 @@ using UnityEngine;
 using Force;
 
 
-namespace GameUI
+namespace Visualizers
 {
     public class ForceFieldVisualizer : MonoBehaviour
     {   

@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Hinge = VehicleComponents.Actuators.Hinge;
 using Propeller = VehicleComponents.Actuators.Propeller;
 
 
@@ -24,7 +23,7 @@ namespace SmarcGUI.KeyboardControllers
         public Propeller HorizontalLeftBackProp;
 
 
-        InputAction forwardAction, strafeAction, verticalAction, rollAction, pitchAction, tvAction;
+        InputAction forwardAction, strafeAction, verticalAction, rollAction, tvAction;
 
 
         void Start()
