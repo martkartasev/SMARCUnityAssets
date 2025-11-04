@@ -1,10 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 using Force;
 
-namespace GameUI
+namespace Visualizers
 {
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(TrailRenderer))]

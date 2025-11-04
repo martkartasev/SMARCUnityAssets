@@ -5,7 +5,7 @@ using UnityEngine;
 
 using Sonar = VehicleComponents.Sensors.Sonar;
 
-namespace GameUI
+namespace Visualizers
 {
 
     public class RayViewer : MonoBehaviour
