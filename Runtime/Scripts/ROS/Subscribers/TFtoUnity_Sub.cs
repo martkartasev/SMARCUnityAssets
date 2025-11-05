@@ -143,12 +143,12 @@ namespace ROS.Subscribers
                                 (float)ros_tf.rotation.w));
                     }
 
-                    // special case child: map_gt
+                    // special case child: unity_origin
                     // we _know_ this is published by US
                     // and we _know_ that it is at unity-origin.
                     // so over-write any position transforms that might
                     // have been modified during the round-trip
-                    if(child_id == "map_gt") child_tf.position = Vector3.zero;
+                    if(child_id == "unity_origin") child_tf.position = Vector3.zero;
 
                     // lastly, all these utm-map stuff needs to happen _once_
                     initialized_utm_map_frames.Add($"{parent_id}-{child_id}");

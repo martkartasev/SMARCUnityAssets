@@ -12,20 +12,19 @@ using ROS.Core;
 
 namespace ROS.Publishers
 {
-    public class UTMtoMapPublisher: ROSPublisher<TFMessageMsg>
+    public class UTMtoUnityOriginPublisher: ROSPublisher<TFMessageMsg>
     {
         GPSRef gpsRef;
-        TransformStampedMsg utmToMapMsg, utmZBToUtmMsg;
-        TransformMsg originTf;
+        TransformStampedMsg utmToUnityMsg, utmZBToUtmMsg;
 
 
         protected override void InitPublisher()
         {
             topic = "/tf";
-            var utmpubs = FindObjectsByType<UTMtoMapPublisher>(FindObjectsSortMode.None);
+            var utmpubs = FindObjectsByType<UTMtoUnityOriginPublisher>(FindObjectsSortMode.None);
             if(utmpubs.Length > 1)
             {
-                Debug.LogWarning("Found too many UTM->Map_gt publishers in the scene, there should only be one!");
+                Debug.LogWarning("Found too many UTM->unity_origin publishers in the scene, there should only be one!");
             }
 
             var gpsRefs = FindObjectsByType<GPSRef>(FindObjectsSortMode.None);
@@ -44,7 +43,7 @@ namespace ROS.Publishers
 
             // make sure this is in the origin
             // why origin? so that we can tell all other tf publishers
-            // in the scene to publish a "global" frame that is map_gt
+            // in the scene to publish a "global" frame that is unity_origin
             // and they wont need to do any origin shenanigans that way
             transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
 
@@ -52,14 +51,14 @@ namespace ROS.Publishers
             var (originEasting, originNorthing, _, _) = gpsRef.GetUTMLatLonOfObject(gameObject);
             var utm_zone_band = $"utm_{gpsRef.UTMZone}_{gpsRef.UTMBand}";
 
-            var mapgt_in_utm = new TransformMsg();
-            mapgt_in_utm.translation.x = originEasting;
-            mapgt_in_utm.translation.y = originNorthing;
+            var unity_origin_in_utm = new TransformMsg();
+            unity_origin_in_utm.translation.x = originEasting;
+            unity_origin_in_utm.translation.y = originNorthing;
 
-            utmToMapMsg = new TransformStampedMsg(
+            utmToUnityMsg = new TransformStampedMsg(
                 new HeaderMsg(new TimeStamp(Clock.time), "utm"), //header
-                "map_gt", //child frame_id
-                mapgt_in_utm
+                "unity_origin", //child frame_id
+                unity_origin_in_utm
             );
 
             // also create a dummy utm_Z_B -> utm tf for people
@@ -74,7 +73,7 @@ namespace ROS.Publishers
             List<TransformStampedMsg> tfMessageList = new List<TransformStampedMsg>
             {
                 utmZBToUtmMsg,
-                utmToMapMsg
+                utmToUnityMsg
             };
             // These transforms never change during play mode
             // so we can publish the same message all the time
@@ -85,13 +84,13 @@ namespace ROS.Publishers
         {
             // these are static transforms, they just change stamps...
             var stamp = new TimeStamp(Clock.time);
-            utmToMapMsg.header.stamp = stamp;
+            utmToUnityMsg.header.stamp = stamp;
             utmZBToUtmMsg.header.stamp = stamp;
 
             List<TransformStampedMsg> tfMessageList = new List<TransformStampedMsg>
             {
                 utmZBToUtmMsg,
-                utmToMapMsg
+                utmToUnityMsg
             };
             // These transforms never change during play mode
             // so we can publish the same message all the time
