@@ -12,7 +12,7 @@ namespace ROS.Publishers
     public class ROSTransformTreePublisher : ROSPublisher<TFMessageMsg>
     {
         [Header("TF Tree Publisher")]
-        [Tooltip("Frame between unity_origin and <robot_name>/odom. If empty, unity_origin->map will be 0-transform.")]
+        [Tooltip("Frame between unity_origin and <robot_name>/odom. If empty, map == odom.")]
         public Transform MapFrameTransform;
         TransformTreeNode BaseLinkTreeNode;
         GameObject BaseLinkGO;
@@ -100,31 +100,24 @@ namespace ROS.Publishers
             var unityToMapMsg = new TransformMsg();
             var mapToOdomMsg = new TransformMsg();
 
-            if (MapFrameTransform != null)
-            {
-                unityToMapMsg.translation = MapFrameTransform.To<ENU>().translation;
-                unityToMapMsg.rotation = MapFrameTransform.To<FLU>().rotation;
+            if (MapFrameTransform == null) MapFrameTransform = OdomLinkGO.transform;
 
-                Vector3 mapToOdomTransform = MapFrameTransform.InverseTransformPoint(OdomLinkGO.transform.position);
-                var mapToOdomPos = ENU.ConvertFromRUF(mapToOdomTransform);
-                Debug.Log($"Map to Odom Pos: {mapToOdomPos}");
-                mapToOdomMsg.translation = new Vector3Msg(
-                    mapToOdomPos.x,
-                    mapToOdomPos.y,
-                    mapToOdomPos.z);
-                var mapToOdomOri = FLU.ConvertFromRUF(Quaternion.Inverse(MapFrameTransform.rotation) * OdomLinkGO.transform.rotation);
-                mapToOdomMsg.rotation = new QuaternionMsg(
-                    mapToOdomOri.x,
-                    mapToOdomOri.y,
-                    mapToOdomOri.z,
-                    mapToOdomOri.w);
-            }
-            else
-            {
-                // unity to map is 0-transform already
-                // and map to odom is just odom in unity coords when map is at origin
-                mapToOdomMsg.translation = OdomLinkGO.transform.To<ENU>().translation;
-            }
+            unityToMapMsg.translation = MapFrameTransform.To<ENU>().translation;
+            unityToMapMsg.rotation = MapFrameTransform.To<FLU>().rotation;
+
+            Vector3 mapToOdomTransform = MapFrameTransform.InverseTransformPoint(OdomLinkGO.transform.position);
+            var mapToOdomPos = ENU.ConvertFromRUF(mapToOdomTransform);
+            Debug.Log($"Map to Odom Pos: {mapToOdomPos}");
+            mapToOdomMsg.translation = new Vector3Msg(
+                mapToOdomPos.x,
+                mapToOdomPos.y,
+                mapToOdomPos.z);
+            var mapToOdomOri = FLU.ConvertFromRUF(Quaternion.Inverse(MapFrameTransform.rotation) * OdomLinkGO.transform.rotation);
+            mapToOdomMsg.rotation = new QuaternionMsg(
+                mapToOdomOri.x,
+                mapToOdomOri.y,
+                mapToOdomOri.z,
+                mapToOdomOri.w);
 
             var unityToMap = new TransformStampedMsg(
                 new HeaderMsg(new TimeStamp(Clock.time), "unity_origin"),
