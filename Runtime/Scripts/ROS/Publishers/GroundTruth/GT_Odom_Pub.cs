@@ -27,7 +27,7 @@ namespace ROS.Publishers.GroundTruth
                 }
 
                 GetRobotGO(out var robotGO);
-                ROSMsg.header.frame_id = "map_gt";
+                ROSMsg.header.frame_id = "unity_origin";
                 ROSMsg.child_frame_id = $"{robotGO.name}/base_link";
             }
         }
