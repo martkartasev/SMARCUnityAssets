@@ -108,7 +108,7 @@ namespace ROS.Publishers
             unityToMapMsg.rotation = MapFrameTransform.To<FLU>().rotation;
 
             Vector3 mapToOdomTransform = MapFrameTransform.InverseTransformPoint(OdomLinkGO.transform.position);
-            var mapToOdomPos = ENU.ConvertFromRUF(mapToOdomTransform);
+            var mapToOdomPos = FLU.ConvertFromRUF(mapToOdomTransform);
             mapToOdomMsg.translation = new Vector3Msg(
                 mapToOdomPos.x,
                 mapToOdomPos.y,
@@ -141,11 +141,11 @@ namespace ROS.Publishers
             // utm -(0)-> utm_ZONE_BAND -(cached)-> unity_origin -(cached)-> VEHICLE/map -(cached)-> VEHICLE/odom -(dynamic)-> VEHICLE/base_link -> children...
 
             var tfMessageList = new List<TransformStampedMsg>();
-
+            //TODO: Restore frame switching from GIT history
             
             // odom -> base_link first
-            var rosOdomPos = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localPosition);
-            var rosOdomOri = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localRotation);
+            var rosOdomPos = FLU.ConvertFromRUF(BaseLinkTreeNode.Transform.localPosition);
+            var rosOdomOri = FLU.ConvertFromRUF(BaseLinkTreeNode.Transform.localRotation);
             var odomToBaseLinkTFMSG = new TransformMsg
             {
                 translation = new Vector3Msg(
