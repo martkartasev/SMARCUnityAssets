@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using RosMessageTypes.Geometry;
 using RosMessageTypes.Std;
@@ -11,6 +12,7 @@ namespace ROS.Publishers
 {
     public class ROSTransformTreePublisher : ROSPublisher<TFMessageMsg>
     {
+        public CoordinateSpaceSelection odomAndBaseLinkCoordinateFrame = CoordinateSpaceSelection.ENU;
         TransformTreeNode BaseLinkTreeNode;
 
         GameObject BaseLinkGO;
@@ -30,12 +32,11 @@ namespace ROS.Publishers
                 topic = "/tf";
             }
 
-            if (transform.rotation != Quaternion.identity)
+            if (odomAndBaseLinkCoordinateFrame == CoordinateSpaceSelection.ENU && transform.rotation != Quaternion.identity)
             {
                 Debug.LogWarning($"[{transform.name}] TF Publisher transform (probably the root robot object: {transform.name}) is not identity, this will cause issues with the TF tree! Resetting to identity.");
                 transform.rotation = Quaternion.identity;
             }
-
         }
 
         protected override void InitPublisher()
@@ -47,6 +48,7 @@ namespace ROS.Publishers
             {
                 OdomLinkGO = transform.gameObject;
             }
+
             if (GetBaseLink(out var baseLink))
             {
                 BaseLinkGO = baseLink.gameObject;
@@ -65,6 +67,7 @@ namespace ROS.Publishers
                 {
                     topParent = topParent.parent;
                 }
+
                 robot_name = topParent.name;
             }
         }
@@ -93,10 +96,7 @@ namespace ROS.Publishers
             // odom frame is cached in StartROS, it is the position of the robot at game start
             // we want the transform from base_link to odom
 
-            var mapToOdomMsg = new TransformMsg
-            {
-                translation = OdomLinkGO.transform.To<ENU>().translation,
-            };
+            var mapToOdomMsg = BuildMapToOdomMsg();
             var mapToOdom = new TransformStampedMsg(
                 new HeaderMsg(new TimeStamp(Clock.time), "map_gt"),
                 $"{robot_name}/odom",
@@ -104,26 +104,75 @@ namespace ROS.Publishers
             tfMessageList.Add(mapToOdom);
 
             // base_link is the robot's main frame, so we want to publish the transform from odom to base_link
-            var rosOdomPos = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localPosition);
-            var rosOdomOri = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localRotation);
-            var odomToBaseLinkMsg = new TransformMsg
-            {
-                translation = new Vector3Msg(
-                    rosOdomPos.x,
-                    rosOdomPos.y,
-                    rosOdomPos.z),
-                rotation = new QuaternionMsg(
-                    rosOdomOri.x,
-                    rosOdomOri.y,
-                    rosOdomOri.z,
-                    rosOdomOri.w)
-            };
+            var odomToBaseLinkMsg = BuildOdomToBaseLinkMsg();
             var odomToBaseLink = new TransformStampedMsg(
                 new HeaderMsg(new TimeStamp(Clock.time), $"{robot_name}/odom"),
                 $"{robot_name}/{BaseLinkTreeNode.name}",
                 odomToBaseLinkMsg);
             tfMessageList.Add(odomToBaseLink);
         }
+
+
+        private TransformMsg BuildMapToOdomMsg()
+        {
+            TransformMsg mapToOdomMsg;
+
+            switch (odomAndBaseLinkCoordinateFrame)
+            {
+                case CoordinateSpaceSelection.ENU:
+                    mapToOdomMsg = new TransformMsg
+                    {
+                        translation = OdomLinkGO.transform.To<ENU>().translation,
+                    };
+                    break;
+                case CoordinateSpaceSelection.FLU:
+                    mapToOdomMsg = new TransformMsg
+                    {
+                        translation = OdomLinkGO.transform.To<FLU>().translation,
+                        rotation = OdomLinkGO.transform.To<FLU>().rotation,
+                    };
+                    break;
+                default:
+                    throw new ArgumentException($"Please provide support for CoordinateFrame:{odomAndBaseLinkCoordinateFrame}");
+            }
+
+            return mapToOdomMsg;
+        }
+
+        private TransformMsg BuildOdomToBaseLinkMsg()
+        {
+            TransformMsg odomToBaseLinkMsg;
+            Vector3 rosOdomPos;
+            Quaternion rosOdomOri;
+
+            switch (odomAndBaseLinkCoordinateFrame)
+            {
+                case CoordinateSpaceSelection.ENU:
+                    rosOdomPos = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localPosition);
+                    rosOdomOri = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localRotation);
+                    odomToBaseLinkMsg = new TransformMsg
+                    {
+                        translation = new Vector3Msg(rosOdomPos.x, rosOdomPos.y, rosOdomPos.z),
+                        rotation = new QuaternionMsg(rosOdomOri.x, rosOdomOri.y, rosOdomOri.z, rosOdomOri.w)
+                    };
+                    break;
+                case CoordinateSpaceSelection.FLU:
+                    rosOdomPos = FLU.ConvertFromRUF(BaseLinkTreeNode.Transform.localPosition);
+                    rosOdomOri = FLU.ConvertFromRUF(BaseLinkTreeNode.Transform.localRotation);
+                    odomToBaseLinkMsg = new TransformMsg
+                    {
+                        translation = new Vector3Msg(rosOdomPos.x, rosOdomPos.y, rosOdomPos.z),
+                        rotation = new QuaternionMsg(rosOdomOri.x, rosOdomOri.y, rosOdomOri.z, rosOdomOri.w)
+                    };
+                    break;
+                default:
+                    throw new ArgumentException($"Please provide support for CoordinateFrame:{odomAndBaseLinkCoordinateFrame}");
+            }
+
+
+            return odomToBaseLinkMsg;
+        }
+
 
         protected override void UpdateMessage()
         {
@@ -141,6 +190,7 @@ namespace ROS.Publishers
                 BaseLinkTreeNode = new TransformTreeNode(BaseLinkGO);
                 return;
             }
+
             foreach (TransformStampedMsg msg in tfMessageList)
             {
                 msg.header.frame_id = $"{robot_name}/{msg.header.frame_id}";
@@ -157,6 +207,5 @@ namespace ROS.Publishers
         {
             robot_name = name;
         }
-
     }
 }
