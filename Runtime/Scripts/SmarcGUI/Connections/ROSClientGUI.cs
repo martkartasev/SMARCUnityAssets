@@ -31,7 +31,7 @@ namespace SmarcGUI.Connections
         string ServerAddress => ServerAddressInput.text;
         int ServerPort => int.Parse(PortInput.text);
 
-        ROSBehaviour[] rosBehaviours;
+        List<ROSBehaviour> rosBehaviours;
 
         Joy_Pub joyPub;
 
@@ -54,7 +54,14 @@ namespace SmarcGUI.Connections
                 joyPub.enabled = false;
             }
 
-            rosBehaviours = FindObjectsByType<ROSBehaviour>(FindObjectsSortMode.None);
+            // Only mess with aleady enabled ROSBehaviours
+            // so we don't accidentally enable something the user didn't want.
+            var allRosBehaviours = FindObjectsByType<ROSBehaviour>(FindObjectsSortMode.None);
+            rosBehaviours = new();
+            foreach (var b in allRosBehaviours)
+            {
+                if (b.enabled) rosBehaviours.Add(b);
+            }
             Debug.Log("Disabling ROSBehaviours until connected to ROS.");
             foreach (var b in rosBehaviours) b.enabled = false;
 

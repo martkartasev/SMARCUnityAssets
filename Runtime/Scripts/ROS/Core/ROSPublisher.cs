@@ -60,9 +60,14 @@ namespace ROS.Core
                 firstPub = false;
             }
             int i = 0;
+
+            // We might publish it many times, but no need to update the message more than once
+            // in the same FixedUpdate.
+            if (timer.NeedsTick(Clock.Now)) UpdateMessage();
+            
+            // Publish the same thing as many times as needed to match the expected frequency.
             while (timer.NeedsTick(Clock.Now))
             {
-                UpdateMessage();
                 rosCon.Publish(topic, ROSMsg);
                 timer.Tick();
                 i++;

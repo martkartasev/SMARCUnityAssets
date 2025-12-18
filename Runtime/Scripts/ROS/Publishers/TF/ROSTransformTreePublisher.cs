@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using RosMessageTypes.Geometry;
 using RosMessageTypes.Std;
@@ -12,11 +11,16 @@ namespace ROS.Publishers
 {
     public class ROSTransformTreePublisher : ROSPublisher<TFMessageMsg>
     {
-        public CoordinateSpaceSelection odomAndBaseLinkCoordinateFrame = CoordinateSpaceSelection.ENU;
+        [Header("TF Tree Publisher")]
+        [Tooltip("Frame between unity_origin and <robot_name>/odom. If empty, map == odom.")]
+        public Transform MapFrameTransform;
+        [Tooltip("Adds a prefix to all TF frames published by this publisher, except unity_origin.")]
+        public string tf_prefix = "";
         TransformTreeNode BaseLinkTreeNode;
-
         GameObject BaseLinkGO;
         GameObject OdomLinkGO;
+
+        List<TransformStampedMsg> staticTFs = new List<TransformStampedMsg>();
 
         void OnValidate()
         {
@@ -31,12 +35,6 @@ namespace ROS.Publishers
                 Debug.LogWarning($"TF Publisher topic set to {topic} but should be /tf. Setting to /tf!");
                 topic = "/tf";
             }
-
-            if (odomAndBaseLinkCoordinateFrame == CoordinateSpaceSelection.ENU && transform.rotation != Quaternion.identity)
-            {
-                Debug.LogWarning($"[{transform.name}] TF Publisher transform (probably the root robot object: {transform.name}) is not identity, this will cause issues with the TF tree! Resetting to identity.");
-                transform.rotation = Quaternion.identity;
-            }
         }
 
         protected override void InitPublisher()
@@ -48,7 +46,6 @@ namespace ROS.Publishers
             {
                 OdomLinkGO = transform.gameObject;
             }
-
             if (GetBaseLink(out var baseLink))
             {
                 BaseLinkGO = baseLink.gameObject;
@@ -67,12 +64,14 @@ namespace ROS.Publishers
                 {
                     topParent = topParent.parent;
                 }
-
                 robot_name = topParent.name;
             }
+
+            staticTFs.Clear();
+            PopulateStaticFrames(staticTFs);
         }
 
-        static void PopulateTFList(List<TransformStampedMsg> tfList, TransformTreeNode tfNode)
+        static void PopulateChildrenTFList(List<TransformStampedMsg> tfList, TransformTreeNode tfNode)
         {
             // TODO: Some of this could be done once and cached rather than doing from scratch every time
             // Only generate transform messages from the children, because This node will be parented to the global frame
@@ -82,13 +81,13 @@ namespace ROS.Publishers
 
                 if (!childTf.IsALeafNode)
                 {
-                    PopulateTFList(tfList, childTf);
+                    PopulateChildrenTFList(tfList, childTf);
                 }
             }
         }
 
 
-        void PopulateGlobalFrames(List<TransformStampedMsg> tfMessageList)
+        void PopulateStaticFrames(List<TransformStampedMsg> tfMessageList)
         {
             // we want globally oriented transforms to be the first in the list.
             // map -> odom and odom -> base_link
@@ -96,90 +95,80 @@ namespace ROS.Publishers
             // odom frame is cached in StartROS, it is the position of the robot at game start
             // we want the transform from base_link to odom
 
-            var mapToOdomMsg = BuildMapToOdomMsg();
+            // The tree should look like this:
+            // |--------------- STATIC FRAMES ------------------------------------------------------------||------ very dynamic ---------||--- mixed ----|
+            // utm -(0)-> utm_ZONE_BAND -(cached)-> unity_origin -(cached)-> VEHICLE/map -(cached)-> VEHICLE/odom -(dynamic)-> VEHICLE/base_link -> children...
+
+            var unityToMapMsg = new TransformMsg();
+            var mapToOdomMsg = new TransformMsg();
+
+            if (MapFrameTransform == null) MapFrameTransform = OdomLinkGO.transform;
+
+            unityToMapMsg.translation = MapFrameTransform.To<ENU>().translation;
+            unityToMapMsg.rotation = MapFrameTransform.To<FLU>().rotation;
+
+            Vector3 mapToOdomTransform = MapFrameTransform.InverseTransformPoint(OdomLinkGO.transform.position);
+            var mapToOdomPos = ENU.ConvertFromRUF(mapToOdomTransform);
+            mapToOdomMsg.translation = new Vector3Msg(
+                mapToOdomPos.x,
+                mapToOdomPos.y,
+                mapToOdomPos.z);
+            var mapToOdomOri = FLU.ConvertFromRUF(Quaternion.Inverse(MapFrameTransform.rotation) * OdomLinkGO.transform.rotation);
+            mapToOdomMsg.rotation = new QuaternionMsg(
+                mapToOdomOri.x,
+                mapToOdomOri.y,
+                mapToOdomOri.z,
+                mapToOdomOri.w);
+
+            var unityToMap = new TransformStampedMsg(
+                new HeaderMsg(new TimeStamp(Clock.time), "unity_origin"),
+                $"{tf_prefix}{robot_name}/map",
+                unityToMapMsg);
+
             var mapToOdom = new TransformStampedMsg(
-                new HeaderMsg(new TimeStamp(Clock.time), "map_gt"),
-                $"{robot_name}/odom",
+                new HeaderMsg(new TimeStamp(Clock.time), $"{tf_prefix}{robot_name}/map"),
+                $"{tf_prefix}{robot_name}/odom",
                 mapToOdomMsg);
+
+            tfMessageList.Add(unityToMap);
             tfMessageList.Add(mapToOdom);
-
-            // base_link is the robot's main frame, so we want to publish the transform from odom to base_link
-            var odomToBaseLinkMsg = BuildOdomToBaseLinkMsg();
-            var odomToBaseLink = new TransformStampedMsg(
-                new HeaderMsg(new TimeStamp(Clock.time), $"{robot_name}/odom"),
-                $"{robot_name}/{BaseLinkTreeNode.name}",
-                odomToBaseLinkMsg);
-            tfMessageList.Add(odomToBaseLink);
         }
-
-
-        private TransformMsg BuildMapToOdomMsg()
-        {
-            TransformMsg mapToOdomMsg;
-
-            switch (odomAndBaseLinkCoordinateFrame)
-            {
-                case CoordinateSpaceSelection.ENU:
-                    mapToOdomMsg = new TransformMsg
-                    {
-                        translation = OdomLinkGO.transform.To<ENU>().translation,
-                    };
-                    break;
-                case CoordinateSpaceSelection.FLU:
-                    mapToOdomMsg = new TransformMsg
-                    {
-                        translation = OdomLinkGO.transform.To<FLU>().translation,
-                        rotation = OdomLinkGO.transform.To<FLU>().rotation,
-                    };
-                    break;
-                default:
-                    throw new ArgumentException($"Please provide support for CoordinateFrame:{odomAndBaseLinkCoordinateFrame}");
-            }
-
-            return mapToOdomMsg;
-        }
-
-        private TransformMsg BuildOdomToBaseLinkMsg()
-        {
-            TransformMsg odomToBaseLinkMsg;
-            Vector3 rosOdomPos;
-            Quaternion rosOdomOri;
-
-            switch (odomAndBaseLinkCoordinateFrame)
-            {
-                case CoordinateSpaceSelection.ENU:
-                    rosOdomPos = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localPosition);
-                    rosOdomOri = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localRotation);
-                    odomToBaseLinkMsg = new TransformMsg
-                    {
-                        translation = new Vector3Msg(rosOdomPos.x, rosOdomPos.y, rosOdomPos.z),
-                        rotation = new QuaternionMsg(rosOdomOri.x, rosOdomOri.y, rosOdomOri.z, rosOdomOri.w)
-                    };
-                    break;
-                case CoordinateSpaceSelection.FLU:
-                    rosOdomPos = FLU.ConvertFromRUF(BaseLinkTreeNode.Transform.localPosition);
-                    rosOdomOri = FLU.ConvertFromRUF(BaseLinkTreeNode.Transform.localRotation);
-                    odomToBaseLinkMsg = new TransformMsg
-                    {
-                        translation = new Vector3Msg(rosOdomPos.x, rosOdomPos.y, rosOdomPos.z),
-                        rotation = new QuaternionMsg(rosOdomOri.x, rosOdomOri.y, rosOdomOri.z, rosOdomOri.w)
-                    };
-                    break;
-                default:
-                    throw new ArgumentException($"Please provide support for CoordinateFrame:{odomAndBaseLinkCoordinateFrame}");
-            }
-
-
-            return odomToBaseLinkMsg;
-        }
-
 
         protected override void UpdateMessage()
         {
+            // The tree should look like this:
+            // |--------------- STATIC FRAMES ------------------------------------------------------------||------ very dynamic ---------||--- mixed ----|
+            // utm -(0)-> utm_ZONE_BAND -(cached)-> unity_origin -(cached)-> VEHICLE/map -(cached)-> VEHICLE/odom -(dynamic)-> VEHICLE/base_link -> children...
+
             var tfMessageList = new List<TransformStampedMsg>();
+
+            
+            // odom -> base_link first
+            var rosOdomPos = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localPosition);
+            var rosOdomOri = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localRotation);
+            var odomToBaseLinkTFMSG = new TransformMsg
+            {
+                translation = new Vector3Msg(
+                    rosOdomPos.x,
+                    rosOdomPos.y,
+                    rosOdomPos.z),
+                rotation = new QuaternionMsg(
+                    rosOdomOri.x,
+                    rosOdomOri.y,
+                    rosOdomOri.z,
+                    rosOdomOri.w)
+            };
+            var odomToBaseLink = new TransformStampedMsg(
+                new HeaderMsg(new TimeStamp(Clock.time), "odom"),
+                BaseLinkTreeNode.name,
+                odomToBaseLinkTFMSG);
+
+            tfMessageList.Add(odomToBaseLink);
+
+            // base_link -> children next
             try
             {
-                PopulateTFList(tfMessageList, BaseLinkTreeNode);
+                PopulateChildrenTFList(tfMessageList, BaseLinkTreeNode);
             }
             catch (MissingReferenceException)
             {
@@ -191,14 +180,20 @@ namespace ROS.Publishers
                 return;
             }
 
+            // prefix all frames with the robot name to create a namespace
             foreach (TransformStampedMsg msg in tfMessageList)
             {
-                msg.header.frame_id = $"{robot_name}/{msg.header.frame_id}";
-                msg.child_frame_id = $"{robot_name}/{msg.child_frame_id}";
+                msg.header.frame_id = $"{tf_prefix}{robot_name}/{msg.header.frame_id}";
+                msg.child_frame_id = $"{tf_prefix}{robot_name}/{msg.child_frame_id}";
             }
 
-            // populate the global frames last, dont wanna prefix those.
-            PopulateGlobalFrames(tfMessageList);
+            // refresh the times of the static frames
+            foreach (TransformStampedMsg staticTF in staticTFs)
+            {
+                staticTF.header.stamp = new TimeStamp(Clock.time);
+            }
+            // finally add the static frames last so they are not namespaced
+            tfMessageList.AddRange(staticTFs);
 
             ROSMsg = new TFMessageMsg(tfMessageList.ToArray());
         }
@@ -207,5 +202,6 @@ namespace ROS.Publishers
         {
             robot_name = name;
         }
+
     }
 }
