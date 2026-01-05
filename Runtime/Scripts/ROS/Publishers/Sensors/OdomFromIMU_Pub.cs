@@ -2,26 +2,27 @@ using UnityEngine;
 using RosMessageTypes.Nav;
 using Unity.Robotics.Core; //Clock
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
-
 using SensorIMU = VehicleComponents.Sensors.IMU;
 using ROS.Core;
+using RosMessageTypes.Geometry;
+using Scripts.ROS.Core;
 
 
 namespace ROS.Publishers
 {
     [RequireComponent(typeof(SensorIMU))]
-    public class OdomFromIMU_Pub: ROSSensorPublisher<OdometryMsg, SensorIMU>
-    { 
+    public class OdomFromIMU_Pub : ROSSensorPublisher<OdometryMsg, SensorIMU>
+    {
         [Tooltip("If false, orientation is in ENU in ROS.")]
-        public bool useNED = false;
+        public Unity.Robotics.ROSTCPConnector.ROSGeometry.CoordinateSpaceSelection targetSpace = Unity.Robotics.ROSTCPConnector.ROSGeometry.CoordinateSpaceSelection.ENU;
 
-        [Header("Debug")]
-        public Vector3 ROSPosition;
+        [Header("Debug")] public Vector3 ROSPosition;
 
         public OdometryMsg GetRosMsg()
         {
             return ROSMsg;
         }
+
         protected override void InitPublisher()
         {
             ROSMsg.header.frame_id = "unity_origin";
@@ -33,16 +34,11 @@ namespace ROS.Publishers
         {
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
 
-            if(useNED) 
-            {
-                ROSMsg.pose.pose.orientation = DataSource.orientation.To<NED>();
-                ROSMsg.pose.pose.position = DataSource.transform.position.To<NED>();
-            }
-            else
-            {
-                ROSMsg.pose.pose.orientation = DataSource.orientation.To<ENU>();
-                ROSMsg.pose.pose.position = DataSource.transform.position.To<ENU>();
-            } 
+
+           
+            ROSMsg.pose.pose.orientation = DataSource.orientation.ToROS(targetSpace);
+            ROSMsg.pose.pose.position = DataSource.transform.position.ToROS(targetSpace);
+
 
             ROSPosition.x = (float)ROSMsg.pose.pose.position.x;
             ROSPosition.y = (float)ROSMsg.pose.pose.position.y;

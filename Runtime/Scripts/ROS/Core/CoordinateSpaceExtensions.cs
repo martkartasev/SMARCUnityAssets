@@ -1,4 +1,5 @@
-﻿using Unity.Robotics.ROSTCPConnector.ROSGeometry;
+﻿using RosMessageTypes.Geometry;
+using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using UnityEngine;
 
 namespace Scripts.ROS.Core
@@ -60,6 +61,54 @@ namespace Scripts.ROS.Core
                 default:
                     Debug.LogError("Invalid coordinate space " + coordinateSpaceSelection);
                     return self.To<RUF>().ToUnity();
+            }
+        }
+
+        public static PointMsg ToROS(this Vector3 self, CoordinateSpaceSelection coordinateSpaceSelection)
+        {
+            switch (coordinateSpaceSelection)
+            {
+                case CoordinateSpaceSelection.RUF:
+                    return self.To<RUF>();
+                case CoordinateSpaceSelection.FLU:
+                    return self.To<FLU>();
+                case CoordinateSpaceSelection.FRD:
+                    return self.To<FRD>();
+                case CoordinateSpaceSelection.ENU:
+                    return self.To<ENU>();
+                case CoordinateSpaceSelection.NED:
+                    return self.To<NED>();
+                case CoordinateSpaceSelection.ENULocal:
+                    return self.To<ENULocal>();
+                case CoordinateSpaceSelection.NEDLocal:
+                    return self.To<NEDLocal>();
+                default:
+                    Debug.LogError("Invalid coordinate space " + coordinateSpaceSelection);
+                    return self.To<RUF>();
+            }
+        }
+
+        public static QuaternionMsg ToROS(this Quaternion self, CoordinateSpaceSelection coordinateSpaceSelection)
+        {
+            switch (coordinateSpaceSelection)
+            {
+                case CoordinateSpaceSelection.RUF:
+                    return self.To<RUF>();
+                case CoordinateSpaceSelection.FLU:
+                    return self.To<FLU>();
+                case CoordinateSpaceSelection.FRD:
+                    return self.To<FRD>();
+                case CoordinateSpaceSelection.ENU:
+                    return self.To<ENU>();
+                case CoordinateSpaceSelection.NED:
+                    return self.To<NED>();
+                case CoordinateSpaceSelection.ENULocal:
+                    return self.To<ENULocal>();
+                case CoordinateSpaceSelection.NEDLocal:
+                    return self.To<NEDLocal>();
+                default:
+                    Debug.LogError("Invalid coordinate space " + coordinateSpaceSelection);
+                    return self.To<RUF>();
             }
         }
     }
