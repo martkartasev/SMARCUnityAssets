@@ -4,7 +4,6 @@ using Unity.Robotics.Core; //Clock
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using SensorIMU = VehicleComponents.Sensors.IMU;
 using ROS.Core;
-using RosMessageTypes.Geometry;
 using Scripts.ROS.Core;
 
 
@@ -13,8 +12,7 @@ namespace ROS.Publishers
     [RequireComponent(typeof(SensorIMU))]
     public class OdomFromIMU_Pub : ROSSensorPublisher<OdometryMsg, SensorIMU>
     {
-        [Tooltip("If false, orientation is in ENU in ROS.")]
-        public Unity.Robotics.ROSTCPConnector.ROSGeometry.CoordinateSpaceSelection targetSpace = Unity.Robotics.ROSTCPConnector.ROSGeometry.CoordinateSpaceSelection.ENU;
+        public CoordinateSpaceSelection targetSpace = CoordinateSpaceSelection.ENU;
 
         [Header("Debug")] public Vector3 ROSPosition;
 
@@ -33,13 +31,10 @@ namespace ROS.Publishers
         protected override void UpdateMessage()
         {
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
-
-
-           
+            
             ROSMsg.pose.pose.orientation = DataSource.orientation.ToROS(targetSpace);
             ROSMsg.pose.pose.position = DataSource.transform.position.ToROS(targetSpace);
-
-
+            
             ROSPosition.x = (float)ROSMsg.pose.pose.position.x;
             ROSPosition.y = (float)ROSMsg.pose.pose.position.y;
             ROSPosition.z = (float)ROSMsg.pose.pose.position.z;
