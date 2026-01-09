@@ -1,9 +1,8 @@
 using UnityEngine;
-using System; //for math
-using UnityEngine.UI;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Geometry;
 using DefaultNamespace.Water;
+using UnityEngine.InputSystem;
 namespace Evolo 
 {
 
@@ -41,6 +40,7 @@ namespace Evolo
         private float currentLinearSpeed=0f;
         private float currentRollAngle =0f;
 
+        InputAction forwardAction, strafeAction;
 
         void OnValidate()
         {
@@ -56,6 +56,9 @@ namespace Evolo
         {
             ros = ROSConnection.GetOrCreateInstance();
             ros.Subscribe<TwistMsg>(subscribeTopic, UpdateBoatControl);
+
+            forwardAction = InputSystem.actions.FindAction("Robot/Forward");
+            strafeAction = InputSystem.actions.FindAction("Robot/Strafe");
             
             // Find the water model in the scene
             var waterModels = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None);
@@ -250,9 +253,12 @@ namespace Evolo
                 }
         }
         void Unity_control_speed_yaw()
-        {
-            float unitySpeedInput = Input.GetAxis("Vertical")/5; // "W/S" keys
-            float unityRollInput = -Input.GetAxis("Horizontal")/1.5f; // "A/D" keys
+        { 
+            var forwardValue = forwardAction.ReadValue<float>(); // "W/S" keys
+            var strafeValue = -strafeAction.ReadValue<float>(); // "A/D" keys
+
+            float unitySpeedInput = forwardValue / 5; 
+            float unityRollInput = strafeValue / 1.5f; 
             
             float added_speed = linearSpeedGoalKt+unitySpeedInput ;
             float difference_speed = unitySpeedInput;
