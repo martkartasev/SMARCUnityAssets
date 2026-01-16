@@ -50,6 +50,8 @@ GameObject:
   - component: {fileID: 3388736631394618474}
   - component: {fileID: 2967109067222843076}
   - component: {fileID: 9190152339477900123}
+  - component: {fileID: 3010733522096284633}
+  - component: {fileID: 1549816000386643114}
   m_Layer: 0
   m_Name: PropellerBack
   m_TagString: Untagged
@@ -90,16 +92,18 @@ MonoBehaviour:
   roll: 0
   pitch: 0
   yaw: 0
+  FixedRotation: 0
   reverse: 1
+  orientation: 0
   rpm: 0
   RPMMax: 1000
   RPMMin: 0
   RPMToForceMultiplier: 0.005
+  RPMReverseMultiplier: 0.6
   HoverDefault: 0
-  NumPropellers: 4
-  ApplyTorque: 0
-  TorqueUp: 0
   DefaultHoverRPM: 0
+  ApplyManualTorque: 0
+  ManualTorqueUp: 0
   baseLinkArticulationBody: {fileID: 0}
   baseLinkRigidBody: {fileID: 0}
 --- !u!114 &2967109067222843076
@@ -115,6 +119,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topic: core/standard/thruster2_fb
+  NotARobot: 0
   frequency: 10
   ignoreSensorState: 0
 --- !u!114 &9190152339477900123
@@ -130,6 +135,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topic: core/standard/thruster2_cmd
+  NotARobot: 0
+  expectedFrequency: 2
+  resetting: 1
+  receivedFrequency: 0
+  ReceivedFirstMessage: 0
+--- !u!114 &3010733522096284633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933738784617273911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0d91e0fb441da148b060633e70f139c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: core/thruster2_fb
+  NotARobot: 0
+  frequency: 10
+--- !u!114 &1549816000386643114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933738784617273911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9734914a875f0374dbfe24150b45df6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: core/thruster2_cmd
+  NotARobot: 0
   expectedFrequency: 2
   resetting: 1
   receivedFrequency: 0
@@ -146,6 +185,8 @@ GameObject:
   - component: {fileID: 5398264578906344436}
   - component: {fileID: 4532675336326002669}
   - component: {fileID: 2231964782047557348}
+  - component: {fileID: 8025424543002023733}
+  - component: {fileID: 710012840611213705}
   m_Layer: 0
   m_Name: VBS
   m_TagString: Untagged
@@ -186,6 +227,7 @@ MonoBehaviour:
   roll: 0
   pitch: 0
   yaw: 0
+  FixedRotation: 0
   percentage: 50.3
   resetValue: 50
   maxVolume_l: 0.25
@@ -203,6 +245,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topic: core/standard/vbs_fb
+  NotARobot: 0
   frequency: 10
   ignoreSensorState: 0
 --- !u!114 &2231964782047557348
@@ -218,6 +261,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topic: core/standard/vbs_cmd
+  NotARobot: 0
+  expectedFrequency: 2
+  resetting: 1
+  receivedFrequency: 0
+  ReceivedFirstMessage: 0
+--- !u!114 &8025424543002023733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2879045420304286706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be8f6c84116488048a24ed3f528ce90c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: core/vbs_fb
+  NotARobot: 0
+  frequency: 10
+--- !u!114 &710012840611213705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2879045420304286706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db735352e95497846a7c4a117f31cc39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: core/vbs_cmd
+  NotARobot: 0
   expectedFrequency: 2
   resetting: 1
   receivedFrequency: 0
@@ -234,6 +311,8 @@ GameObject:
   - component: {fileID: 6295752470259329549}
   - component: {fileID: 6427579228274047843}
   - component: {fileID: 8433107569252019721}
+  - component: {fileID: 1433444701429924789}
+  - component: {fileID: 2412990756455280127}
   m_Layer: 0
   m_Name: PropellerFront
   m_TagString: Untagged
@@ -274,16 +353,18 @@ MonoBehaviour:
   roll: 0
   pitch: 0
   yaw: 0
+  FixedRotation: 0
   reverse: 0
+  orientation: 0
   rpm: 0
   RPMMax: 1000
   RPMMin: 0
   RPMToForceMultiplier: 0.005
+  RPMReverseMultiplier: 0.6
   HoverDefault: 0
-  NumPropellers: 4
-  ApplyTorque: 0
-  TorqueUp: 0
   DefaultHoverRPM: 0
+  ApplyManualTorque: 0
+  ManualTorqueUp: 0
   baseLinkArticulationBody: {fileID: 0}
   baseLinkRigidBody: {fileID: 0}
 --- !u!114 &6427579228274047843
@@ -299,6 +380,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topic: core/standard/thruster1_fb
+  NotARobot: 0
   frequency: 10
   ignoreSensorState: 0
 --- !u!114 &8433107569252019721
@@ -314,6 +396,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topic: core/standard/thruster1_cmd
+  NotARobot: 0
+  expectedFrequency: 2
+  resetting: 1
+  receivedFrequency: 0
+  ReceivedFirstMessage: 0
+--- !u!114 &1433444701429924789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5487030688596474276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0d91e0fb441da148b060633e70f139c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: core/thruster1_fb
+  NotARobot: 0
+  frequency: 10
+--- !u!114 &2412990756455280127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5487030688596474276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9734914a875f0374dbfe24150b45df6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: core/thruster1_cmd
+  NotARobot: 0
   expectedFrequency: 2
   resetting: 1
   receivedFrequency: 0
@@ -330,6 +446,8 @@ GameObject:
   - component: {fileID: 150195260434644729}
   - component: {fileID: 17493078953096587}
   - component: {fileID: 8895723212842834944}
+  - component: {fileID: 6999038119726788016}
+  - component: {fileID: 4746527386457277811}
   m_Layer: 0
   m_Name: Battery_LCG
   m_TagString: Untagged
@@ -370,6 +488,7 @@ MonoBehaviour:
   roll: 0
   pitch: 0
   yaw: 0
+  FixedRotation: 0
   percentage: 50
   resetValue: 50
 --- !u!114 &17493078953096587
@@ -385,6 +504,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topic: core/standard/lcg_fb
+  NotARobot: 0
   frequency: 10
   ignoreSensorState: 0
 --- !u!114 &8895723212842834944
@@ -400,10 +520,44 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topic: core/standard/lcg_cmd
+  NotARobot: 0
   expectedFrequency: 2
   resetting: 1
   receivedFrequency: 0
   ReceivedFirstMessage: 0
+--- !u!114 &6999038119726788016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6134472343779380878}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db735352e95497846a7c4a117f31cc39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: core/lcg_cmd
+  NotARobot: 0
+  expectedFrequency: 2
+  resetting: 1
+  receivedFrequency: 0
+  ReceivedFirstMessage: 0
+--- !u!114 &4746527386457277811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6134472343779380878}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be8f6c84116488048a24ed3f528ce90c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: core/lcg_fb
+  NotARobot: 0
+  frequency: 10
 --- !u!1 &6492752199017079265
 GameObject:
   m_ObjectHideFlags: 0
@@ -415,6 +569,7 @@ GameObject:
   - component: {fileID: 8625740175431605293}
   - component: {fileID: 2680158660300619110}
   - component: {fileID: 8722047277435163285}
+  - component: {fileID: 1359318736637056421}
   m_Layer: 0
   m_Name: ThrusterPitch
   m_TagString: Untagged
@@ -455,6 +610,7 @@ MonoBehaviour:
   roll: 0
   pitch: 0
   yaw: 0
+  FixedRotation: 0
   angle: 0
   AngleMax: 0.2
   reverse: 0
@@ -471,11 +627,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topic: core/standard/thrust_vector_pitch_cmd
+  NotARobot: 0
   expectedFrequency: 2
   resetting: 1
   receivedFrequency: 0
   ReceivedFirstMessage: 0
   angleChoice: 0
+--- !u!114 &1359318736637056421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6492752199017079265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb5392f70365f01428c32344e974fcfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: core/thrust_vector_cmd
+  NotARobot: 0
+  expectedFrequency: 2
+  resetting: 1
+  receivedFrequency: 0
+  ReceivedFirstMessage: 0
+  axis: 0
 --- !u!1 &6784644159264955759
 GameObject:
   m_ObjectHideFlags: 0
@@ -487,6 +663,7 @@ GameObject:
   - component: {fileID: 6242521599426934361}
   - component: {fileID: 8718265960510638219}
   - component: {fileID: 6077257626405968604}
+  - component: {fileID: 131148592012403515}
   m_Layer: 0
   m_Name: ThrusterYaw
   m_TagString: Untagged
@@ -527,6 +704,7 @@ MonoBehaviour:
   roll: 0
   pitch: 0
   yaw: 0
+  FixedRotation: 0
   angle: 0
   AngleMax: 0.2
   reverse: 0
@@ -543,11 +721,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topic: core/standard/thrust_vector_yaw_cmd
+  NotARobot: 0
   expectedFrequency: 2
   resetting: 1
   receivedFrequency: 0
   ReceivedFirstMessage: 0
   angleChoice: 1
+--- !u!114 &131148592012403515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6784644159264955759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb5392f70365f01428c32344e974fcfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: core/thrust_vector_cmd
+  NotARobot: 0
+  expectedFrequency: 2
+  resetting: 1
+  receivedFrequency: 0
+  ReceivedFirstMessage: 0
+  axis: 1
 --- !u!1 &7554311176727221456
 GameObject:
   m_ObjectHideFlags: 0
@@ -602,6 +800,7 @@ MonoBehaviour:
   roll: 0
   pitch: 0
   yaw: 0
+  FixedRotation: 0
 --- !u!33 &5491911011354246064
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -649,6 +848,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topic: acoustic/write
+  NotARobot: 0
 --- !u!114 &4283975466953008098
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -662,5 +862,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topic: acoustic/read
+  NotARobot: 0
   frequency: 10
   ignoreSensorState: 0
