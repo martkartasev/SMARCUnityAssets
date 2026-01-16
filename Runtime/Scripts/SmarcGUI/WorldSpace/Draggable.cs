@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 namespace SmarcGUI.WorldSpace
 {
@@ -45,7 +46,7 @@ namespace SmarcGUI.WorldSpace
             guiState.MouseDragging = true;
             
             // https://gist.github.com/SimonDarksideJ/477f5674285b63cba8e752c43950ed7c
-            Ray camRay = guiState.CurrentCam.ScreenPointToRay(Input.mousePosition); // Get the ray from mouse position
+            Ray camRay = guiState.CurrentCam.ScreenPointToRay(Mouse.current.position.ReadValue()); // Get the ray from mouse position
             Vector3 planeOrigin = transform.position; // Take current position of this draggable object as Plane's Origin
             Vector3 planeNormal = -guiState.CurrentCam.transform.forward; // Take current negative camera's forward as Plane's Normal
             Plane plane = new(planeNormal, planeOrigin); // Create a plane with the normal and origin.

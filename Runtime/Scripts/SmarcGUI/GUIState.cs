@@ -10,6 +10,7 @@ using UnityEngine.UI;
 using SmarcGUI.WorldSpace;
 using System;
 using System.IO;
+using UnityEngine.InputSystem;
 
 
 
@@ -50,6 +51,7 @@ namespace SmarcGUI
         int defaultCameraIndex = 0;
         public float DefaultCameraLookAtMin = 1;
         public float DefaultCameraLookAtMax = 100;
+        public float FlyCameraSensitivity = 0.2f;
 
 
         Dictionary<string, string> cameraTextToObjectPath;
@@ -99,7 +101,7 @@ namespace SmarcGUI
             foreach(Camera c in cams)
             {
                 // dont mess with sensor cameras
-                if(c.gameObject.TryGetComponent(out Sensor s)) continue;
+                if(c.gameObject.TryGetComponent(out VehicleComponents.Sensors.Sensor s)) continue;
                 // disable all cams by default. we will enable one later.
                 c.enabled = false;
                 // disable all audiolisteners. we got no audio. we wont enable these.
@@ -239,7 +241,7 @@ namespace SmarcGUI
             Vector3 targetPos = DefaultPointerPos;
             if(WorldContextMenu != null && WorldContextMenu.gameObject != null)
             {
-                targetPos = Input.mousePosition;
+                targetPos = Mouse.current.position.ReadValue();
             }
             Ray ray = CurrentCam.ScreenPointToRay(targetPos);
             Plane zeroPlane = new(Vector3.up, Vector3.zero);
@@ -323,7 +325,7 @@ namespace SmarcGUI
 
             // cant use the input system mouse events because we are after mouse-not-over-gui usage of the mouse!
             // so we have to use the old input system for this.
-            if(!MouseOnGUI && Input.GetMouseButtonUp(1))
+            if(!MouseOnGUI && Mouse.current.rightButton.wasReleasedThisFrame)
             {
                 if(CurrentCam != null && CurrentCam.TryGetComponent(out FlyCamera flyCam))
                 {
@@ -335,11 +337,11 @@ namespace SmarcGUI
                     mouseTwoDownTime = 0f;
                     // create a context menu at the mouse position.
                     WorldContextMenu = CreateContextMenu();
-                    WorldContextMenu.SetItem(Input.mousePosition);
+                    WorldContextMenu.SetItem(Mouse.current.position.ReadValue());
                 }
             }
             
-            if(!MouseOnGUI && Input.GetMouseButton(1))
+            if(!MouseOnGUI && Mouse.current.rightButton.isPressed)
             {
                 mouseTwoDownTime += Time.deltaTime;
                 if(mouseTwoDownTime > mouseTwoDelay)
