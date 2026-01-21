@@ -9,6 +9,7 @@ using ROS.Core;
 
 namespace ROS.Publishers
 {
+    [AddComponentMenu("Smarc/ROS/Publishers/Sensors/SonarPointCloud_Pub")]
     [RequireComponent(typeof(Sonar))]
     class SonarPointCloud_Pub: ROSSensorPublisher<PointCloud2Msg, Sonar>
     { 

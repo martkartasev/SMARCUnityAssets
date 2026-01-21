@@ -8,6 +8,7 @@ using ROS.Core;
 
 namespace ROS.Publishers
 {
+    [AddComponentMenu("Smarc/ROS/Publishers/Sensors/GPS_Pub")]
     [RequireComponent(typeof(SensorGPS))]
     class GPS_Pub: ROSSensorPublisher<NavSatFixMsg, SensorGPS>
     { 

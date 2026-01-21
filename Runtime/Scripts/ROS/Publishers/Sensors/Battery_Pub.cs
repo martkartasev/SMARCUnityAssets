@@ -7,6 +7,7 @@ using ROS.Core;
 
 namespace ROS.Publishers
 {
+    [AddComponentMenu("Smarc/ROS/Publishers/Sensors/Battery_Pub")]
     [RequireComponent(typeof(SensorBattery))]
     class Battery_Pub: ROSSensorPublisher<BatteryStateMsg, SensorBattery>
     {

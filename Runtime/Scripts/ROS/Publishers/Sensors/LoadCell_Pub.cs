@@ -5,6 +5,7 @@ using RosMessageTypes.Std;
 
 namespace ROS.Publishers
 {
+    [AddComponentMenu("Smarc/ROS/Publishers/Sensors/LoadCell_Pub")]
     [RequireComponent(typeof(SensorLoadCell))]
     class LoadCell_Pub : ROSSensorPublisher<Float32Msg, SensorLoadCell>
     {

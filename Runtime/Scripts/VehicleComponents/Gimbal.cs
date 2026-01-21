@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[AddComponentMenu("Smarc/VehicleComponents/Gimbal")]
 public class Gimbal : MonoBehaviour
 {
     void Start()

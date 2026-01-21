@@ -12,6 +12,7 @@ using ROS.Core;
 
 namespace ROS.Publishers
 {
+    [AddComponentMenu("Smarc/ROS/Publishers/UTMtoUnityOrigin_Pub")]
     public class UTMtoUnityOriginPublisher: ROSPublisher<TFMessageMsg>
     {
         GPSRef gpsRef;

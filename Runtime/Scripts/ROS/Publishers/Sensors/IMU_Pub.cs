@@ -9,6 +9,7 @@ using ROS.Core;
 
 namespace ROS.Publishers
 {
+    [AddComponentMenu("Smarc/ROS/Publishers/Sensors/IMU_Pub")]
     [RequireComponent(typeof(SensorIMU))]
     class IMU_Pub: ROSSensorPublisher<ImuMsg, SensorIMU>
     { 

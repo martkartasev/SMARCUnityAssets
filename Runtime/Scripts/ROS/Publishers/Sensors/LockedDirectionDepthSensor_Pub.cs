@@ -5,6 +5,7 @@ using ROS.Core;
 
 namespace ROS.Publishers
 {
+    [AddComponentMenu("Smarc/ROS/Publishers/Sensors/LockedDirectionDepthSensor_Pub")]
     [RequireComponent(typeof(SensorDepth))]
     class LockedDirectionDepthSensor_Pub : ROSSensorPublisher<Float32Msg, SensorDepth>
     { 

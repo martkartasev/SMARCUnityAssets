@@ -6,6 +6,7 @@ using ROS.Core; //Clock
 
 namespace ROS.Publishers
 {
+    [AddComponentMenu("Smarc/ROS/Publishers/Joy")]
     class Joy_Pub: ROSPublisher<JoyMsg>
     {
         InputAction lstick, rstick, lb, rb, lt, rt, north, south, east, west, dpad;

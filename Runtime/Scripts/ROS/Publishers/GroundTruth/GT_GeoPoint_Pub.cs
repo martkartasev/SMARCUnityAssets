@@ -6,6 +6,7 @@ using GeoRef;
 
 namespace ROS.Publishers.GroundTruth
 {
+    [AddComponentMenu("Smarc/ROS/Publishers/GroundTruth/GT_GeoPoint_Pub")]
     class GT_GeoPoint_Pub : ROSPublisher<GeoPointMsg>
     {
         Transform base_link;

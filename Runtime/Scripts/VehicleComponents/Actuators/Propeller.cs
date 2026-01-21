@@ -11,6 +11,7 @@ namespace VehicleComponents.Actuators
         YForward
     }
 
+    [AddComponentMenu("Smarc/Actuators/Propeller")]
     public class Propeller : LinkAttachment, IROSPublishable
     {
         [Header("Propeller")]
