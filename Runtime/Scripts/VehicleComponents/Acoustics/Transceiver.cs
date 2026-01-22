@@ -6,7 +6,6 @@ using Unity.Robotics.Core; //Clock
 using DefaultNamespace.Water; // WaterQueryModel
 using Icosphere = DefaultNamespace.IcoSphere;
 using ROS.Core;
-using SmarcGUI;
 using DefaultNamespace;
 
 namespace VehicleComponents.Acoustics
@@ -344,7 +343,7 @@ namespace VehicleComponents.Acoustics
                 bool hitTheGround = false;
                 if(Physics.SphereCast(transform.position, MinChannelRadius, towardsBottomDirection, out groundHit, MaxRange))
                 {
-                    if(groundHit.colliderInstanceID == terrainColliderID) hitTheGround = true;
+                    if(groundHit.colliderEntityId == terrainColliderID) hitTheGround = true;
                 }
                 // check if this is the ground or some other object.
                 // if its anything but the ground, no reflection
