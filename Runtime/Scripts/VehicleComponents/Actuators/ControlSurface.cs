@@ -11,7 +11,7 @@ namespace VehicleComponents.Actuators
     }
 
 
-    [AddComponentMenu("Smarc/Actuators/ControlSurface")]
+    [AddComponentMenu("Smarc/Actuator/ControlSurface")]
     [RequireComponent(typeof(LinkAttachment))]
     public class ControlSurface : MonoBehaviour
     {

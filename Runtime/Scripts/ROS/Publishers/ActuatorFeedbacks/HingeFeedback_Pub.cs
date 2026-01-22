@@ -6,7 +6,7 @@ using RosMessageTypes.Std;
 
 namespace ROS.Publishers
 {
-    [AddComponentMenu("Smarc/ROS/Publishers/Actuators/HingeFeedback_Pub")]
+    [AddComponentMenu("Smarc/ROS/HingeFeedback_Pub")]
     [RequireComponent(typeof(Hinge))]
     public class HingeFeedback_Pub: ROSSensorPublisher<Float32Msg, Hinge>
     {

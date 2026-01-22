@@ -3,10 +3,12 @@ using Unity.Robotics.Core;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using ROS.Core;
 using Force;
+using UnityEngine;
 
 
 namespace M350.PSDK_ROS2
 {
+    [AddComponentMenu("Smarc/PSDK_ROS/PsdkAttitude")]
     public class PsdkAttitude : ROSPublisher<QuaternionStampedMsg>
     {
         

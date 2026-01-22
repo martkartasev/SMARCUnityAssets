@@ -8,7 +8,7 @@ using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 
 namespace ROS.Publishers.GroundTruth
 {
-    [AddComponentMenu("Smarc/ROS/Publishers/GroundTruth/GT_Odom_Pub")]
+    [AddComponentMenu("Smarc/ROS/GT_Odom_Pub")]
     class GT_Odom_Pub : ROSPublisher<OdometryMsg>
     {
         MixedBody body;

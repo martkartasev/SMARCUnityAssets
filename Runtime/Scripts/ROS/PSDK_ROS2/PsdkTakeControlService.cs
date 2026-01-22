@@ -6,6 +6,7 @@ using ROS.Core;
 
 namespace M350.PSDK_ROS2
 {
+    [UnityEngine.AddComponentMenu("Smarc/PSDK_ROS/PsdkTakeControlService")]
     public class PsdkTakeControlService : ROSBehaviour
     {
         bool registered = false;

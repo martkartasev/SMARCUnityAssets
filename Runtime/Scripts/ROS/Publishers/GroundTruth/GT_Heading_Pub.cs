@@ -5,7 +5,7 @@ using RosMessageTypes.Std;
 
 namespace ROS.Publishers.GroundTruth
 {
-    [AddComponentMenu("Smarc/ROS/Publishers/GroundTruth/GT_Heading_Pub")]
+    [AddComponentMenu("Smarc/ROS/GT_Heading_Pub")]
     class GT_Heading_Pub : ROSPublisher<Float32Msg>
     {
         Transform base_link;

@@ -2,7 +2,7 @@
 
 namespace VehicleComponents.Actuators
 {
-    [AddComponentMenu("Smarc/Actuators/Prismatic")]
+    [AddComponentMenu("Smarc/Actuator/Prismatic")]
     public class Prismatic : LinkAttachment, IPercentageActuator
     {
         [Header("Position")] [Range(0, 100)] public float percentage = 50f;

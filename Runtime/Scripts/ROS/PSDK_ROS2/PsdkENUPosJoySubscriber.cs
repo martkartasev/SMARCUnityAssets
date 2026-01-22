@@ -8,6 +8,7 @@ using dji;
 
 namespace M350.PSDK_ROS2
 {
+    [AddComponentMenu("Smarc/PSDK_ROS/PsdkENUPosJoySubscriber")]
     public class PsdkENUPosJoySubscriber : ROSBehaviour
     {
         public float joy_timeout = 1;

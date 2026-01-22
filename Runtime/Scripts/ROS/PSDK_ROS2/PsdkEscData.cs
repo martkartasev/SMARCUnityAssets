@@ -1,11 +1,13 @@
 using Unity.Robotics.Core;
 using RosMessageTypes.PsdkInterfaces;
 using ROS.Core;
+using UnityEngine;
 
 
 
 namespace M350.PSDK_ROS2
 {
+    [AddComponentMenu("Smarc/PSDK_ROS/PsdkEscData")]
     public class PsdkEscData : ROSPublisher<EscDataMsg>
     {
         protected override void UpdateMessage() 

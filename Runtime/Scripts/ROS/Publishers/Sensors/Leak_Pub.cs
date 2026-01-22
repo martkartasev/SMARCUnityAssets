@@ -7,7 +7,7 @@ using ROS.Core;
 
 namespace ROS.Publishers
 {
-    [AddComponentMenu("Smarc/ROS/Publishers/Sensors/Leak_Pub")]
+    [AddComponentMenu("Smarc/ROS/Leak_Pub")]
     [RequireComponent(typeof(SensorLeak))]
     class Leak_Pub: ROSSensorPublisher<BoolMsg, SensorLeak>
     { 

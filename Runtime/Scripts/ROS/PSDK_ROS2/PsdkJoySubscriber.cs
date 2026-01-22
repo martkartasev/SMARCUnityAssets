@@ -8,6 +8,7 @@ using dji;
 
 namespace M350.PSDK_ROS2
 {
+    [AddComponentMenu("Smarc/PSDK_ROS/PsdkJoySubscriber")]
     public class PsdkJoySubscriber : ROSBehaviour
     {
         protected string tf_prefix;

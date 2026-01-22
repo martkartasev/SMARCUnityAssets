@@ -1,13 +1,12 @@
 using UnityEngine;
 using RosMessageTypes.Std;
-using Utils = DefaultNamespace.Utils;
 
 using Propeller = VehicleComponents.Actuators.Propeller;
 using ROS.Core;
 
 namespace ROS.Publishers
 {
-    [AddComponentMenu("Smarc/ROS/Publishers/Actuators/PropellerFeedback_Pub")]
+    [AddComponentMenu("Smarc/ROS/PropellerFeedback_Pub")]
     [RequireComponent(typeof(Propeller))]
     public class PropellerFeedback_Pub: ROSSensorPublisher<Float32Msg, Propeller>
     {

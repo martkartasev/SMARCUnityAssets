@@ -6,7 +6,7 @@ using ROS.Core;
 
 namespace ROS.Publishers
 {
-    [AddComponentMenu("Smarc/ROS/Publishers/Sensors/RangeReciever_Pub")]
+    [AddComponentMenu("Smarc/ROS/RangeReciever_Pub")]
     [RequireComponent(typeof(RangeReciever))]
     class RangeReciever_Pub : ROSSensorPublisher<Float32Msg, RangeReciever>
     { 

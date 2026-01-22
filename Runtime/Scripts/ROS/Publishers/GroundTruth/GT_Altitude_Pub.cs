@@ -6,7 +6,7 @@ using DefaultNamespace.Water;
 
 namespace ROS.Publishers.GroundTruth
 {
-    [AddComponentMenu("Smarc/ROS/Publishers/GroundTruth/GT_Altitude_Pub")]
+    [AddComponentMenu("Smarc/ROS/GT_Altitude_Pub")]
     class GT_Altitude_Pub : ROSPublisher<Float32Msg>
     {
         Transform base_link;

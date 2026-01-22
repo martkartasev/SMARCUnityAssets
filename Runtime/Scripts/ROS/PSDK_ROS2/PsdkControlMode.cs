@@ -1,11 +1,13 @@
 using RosMessageTypes.PsdkInterfaces;
 using dji;
 using ROS.Core;
+using UnityEngine;
 
 
 
 namespace M350.PSDK_ROS2
 {
+    [AddComponentMenu("Smarc/PSDK_ROS/PsdkControlMode")]
     public class PsdkControlMode : ROSPublisher<ControlModeMsg>
     {
         private DJIController controller = null;
