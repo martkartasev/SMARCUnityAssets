@@ -6,25 +6,25 @@ namespace dji
 {
     public enum AltitudeControlMode
     {
-        PositionHold,
-        FLU_Velocity
+        AbsoluteAltitude,
+        VerticalVelocity
     }
     public class AltitudeController : MonoBehaviour
     {
         public ArticulationBody droneAB;
         public Rigidbody droneRB;
         private MixedBody droneBody;
-        public AltitudeControlMode controlMode = AltitudeControlMode.PositionHold;
+        public AltitudeControlMode controlMode = AltitudeControlMode.AbsoluteAltitude;
 
         public float AscentRate = 2.0f; // Ascent rate in meters per second
         public float DescentRate = 2.0f; // Descent rate in meters per second
         public float MaxForce = 0f; // 0 = no explicit force cap
 
 
-        [Header("FLU Velocity Settings")]
-        public float TargetFLUVelocity = 0.0f; // Target vertical velocity in m/s (positive = up, negative = down)
+        [Header("Velocity Settings")]
+        public float TargetVelocity = 0.0f; // Target vertical velocity in m/s (positive = up, negative = down)
 
-        [Header("Position Hold Settings")]
+        [Header("Position Settings")]
         public float TargetAltitude = 10.0f; // Target altitude in meters
         public float AltitudeTolerance = 0.5f; // Acceptable altitude tolerance in meters
         public float GroundLevel = 0f; 
@@ -34,6 +34,7 @@ namespace dji
         public float VelKp = 5.0f;
         public float VelKi = 0.0f;
         public float VelKd = 0.0f;
+        public float VelIntegratorLimit = 5f; // limits integral term (in meter-seconds)
         private float velIntegrator = 0f;
         private float velLastError = 0f;
 
@@ -53,20 +54,19 @@ namespace dji
             droneBody = new MixedBody(droneAB, droneRB);
         }
 
-        // PID tuning
         void FixedUpdate()
         {
-            if (controlMode == AltitudeControlMode.PositionHold)
+            if (controlMode == AltitudeControlMode.AbsoluteAltitude)
             {
                 PositionHold();
             }
-            else if (controlMode == AltitudeControlMode.FLU_Velocity)
+            else if (controlMode == AltitudeControlMode.VerticalVelocity)
             {
-                FLUVelocityControl();
+                VelocityControl();
             }
         }
 
-        void FLUVelocityControl()
+        void VelocityControl()
         {
             {
                 float dt = Time.fixedDeltaTime;
@@ -76,11 +76,11 @@ namespace dji
                 float currentVel = droneBody.velocity.y;
 
                 // PID error (target - current), positive means accelerate up
-                float velError = TargetFLUVelocity - currentVel;
+                float velError = TargetVelocity - currentVel;
 
                 // reuse velIntegrator/velLastError for velocity PID state
                 velIntegrator += velError * dt;
-                velIntegrator = Mathf.Clamp(velIntegrator, -PosIntegratorLimit, PosIntegratorLimit);
+                velIntegrator = Mathf.Clamp(velIntegrator, -VelIntegratorLimit, VelIntegratorLimit);
 
                 float derivative = (velError - velLastError) / dt;
 
