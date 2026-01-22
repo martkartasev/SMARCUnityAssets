@@ -7,9 +7,9 @@ namespace dji
     public enum HorizontalControlMode
     {
         UnityPosition,
-        FLU_HorizontalVelocity
+        Velocity
     }
-    
+
     public class HorizontalController : MonoBehaviour
     {
         public ArticulationBody droneAB;
@@ -19,8 +19,8 @@ namespace dji
         public float MaxForce = 0f; // 0 = no explicit force cap
         public float MaxSpeed = 5.0f; // max horizontal speed in m/s
 
-        [Header("FLU Velocity Controller")]
-        public Vector3 TargetFLUVelocity = Vector3.zero; // Target velocity in m/s
+        [Header("Velocity Controller")]
+        public Vector3 TargetVelocity = Vector3.zero; // Target velocity in m/s
 
         [Header("Unity Position Controller")]
         public Vector3 TargetUnityPosition = Vector3.zero; // Target position in meters
@@ -51,12 +51,12 @@ namespace dji
 
         void FixedUpdate()
         {
-            TargetFLUVelocity.y = 0;
+            TargetVelocity.y = 0;
             if (controlMode == HorizontalControlMode.UnityPosition)
             {
                 PositionHold();
             }
-            else if (controlMode == HorizontalControlMode.FLU_HorizontalVelocity)
+            else if (controlMode == HorizontalControlMode.Velocity)
             {
                 FLUVelocityControl();
             }
@@ -67,7 +67,7 @@ namespace dji
             Vector3 currentVelocity = droneBody.transform.InverseTransformVector(droneBody.velocity);
             currentVelocity.y = 0;
 
-            Vector3 error = TargetFLUVelocity - currentVelocity;
+            Vector3 error = TargetVelocity - currentVelocity;
             velIntegrator += error.magnitude * Time.fixedDeltaTime;
             velIntegrator = Mathf.Clamp(velIntegrator, -VelIntegratorLimit, VelIntegratorLimit);
             float derivative = (error.magnitude - velLastError) / Time.fixedDeltaTime;
