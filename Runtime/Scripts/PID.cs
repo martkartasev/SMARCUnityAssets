@@ -12,14 +12,16 @@ namespace DefaultNamespace
         float integrator = 0f;
         float lastError = 0f;
         float tolerance = 0f;
+        float maxOutput = 0f;
 
-        public PID(float kp, float ki, float kd, float integratorLimit, float tolerance = 0f)
+        public PID(float kp, float ki, float kd, float integratorLimit, float tolerance = 0f, float maxOutput = 0f)
         {
             Kp = kp;
             Ki = ki;
             Kd = kd;
             IntegratorLimit = integratorLimit;
             this.tolerance = tolerance;
+            this.maxOutput = maxOutput;
         }
 
         public Vector3 UpdateVector3(Vector3 target, Vector3 current, float deltaTime)
@@ -34,7 +36,12 @@ namespace DefaultNamespace
             integrator = Mathf.Clamp(integrator, -IntegratorLimit, IntegratorLimit);
             float derivative = (mag - lastError) / deltaTime;
             lastError = mag;
-            return (Kp * error) + (Ki * integrator * error.normalized) + (Kd * derivative * error.normalized);
+            Vector3 output = (Kp * error) + (Ki * integrator * error.normalized) + (Kd * derivative * error.normalized);
+            if (maxOutput > 0f && output.magnitude > maxOutput)
+            {
+                output = output.normalized * maxOutput;
+            }
+            return output;
         }
 
         public float Update(float target, float current, float deltaTime)
@@ -59,7 +66,12 @@ namespace DefaultNamespace
 
             lastError = error;
 
-            return P + I + D;
+            float output = P + I + D;
+            if (maxOutput > 0f && Mathf.Abs(output) > maxOutput)
+            {
+                output = Mathf.Sign(output) * maxOutput;
+            }
+            return output;
         }
 
         public void Reset()

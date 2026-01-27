@@ -15,88 +15,64 @@ namespace dji
     {
         public ArticulationBody RobotAB;
         public Rigidbody RobotRB;
-        private MixedBody robotBody;
+        MixedBody robotBody;
         public HorizontalControlMode ControlMode = HorizontalControlMode.UnityPosition;
-        public float MaxForce = 0f; // 0 = no explicit force cap
-        public float MaxSpeed = 5.0f; // max horizontal speed in m/s
+        public float MaxForce = 0f;
+        public float MaxSpeed = 5.0f;
 
         [Header("Velocity Controller")]
-        public Vector3 TargetVelocity = Vector3.zero; // Target velocity in m/s
-
+        public Vector3 TargetVelocity = Vector3.zero;
         [Header("Unity Position Controller")]
-        public Vector3 TargetUnityPosition = Vector3.zero; // Target position in meters
-        public float PositionTolerance = 0.5f; // Acceptable position tolerance in meters
+        public Vector3 TargetUnityPosition = Vector3.zero;
+        public float PositionTolerance = 0.5f;
 
 
         [Header("Velocity PID")]
         public float VelKp = 5.0f;
         public float VelKi = 0.0f;
         public float VelKd = 0.0f;
-        public float VelIntegratorLimit = 5f; // limits integral term (in meter-seconds)
+        public float VelIntegratorLimit = 5f;
         PID velPID;
 
-
-        [Header("Position PID")]
-        public float PosKp = 2.0f;
-        public float PosKi = 0.5f;
-        public float PosKd = 1.0f;
-        public float PosIntegratorLimit = 5f; // limits integral term (in meter-seconds)
-        PID posPID;
 
         void Start()
         {
             robotBody = new MixedBody(RobotAB, RobotRB);
-            velPID = new PID(VelKp, VelKi, VelKd, VelIntegratorLimit);
-            posPID = new PID(PosKp, PosKi, PosKd, PosIntegratorLimit);
+            velPID = new PID(VelKp, VelKi, VelKd, VelIntegratorLimit, maxOutput:MaxForce);
+
+            // set to current position so it doesnt try to fly away to (usually) origin lol
+            if (ControlMode == HorizontalControlMode.UnityPosition)
+            {
+                TargetUnityPosition = robotBody.transform.position;
+            }
         }
 
         void FixedUpdate()
         {
-            TargetVelocity.y = 0;
             if (ControlMode == HorizontalControlMode.UnityPosition)
             {
-                PositionHold();
+                Vector3 diff = TargetUnityPosition - robotBody.transform.position;
+                if (diff.magnitude <= PositionTolerance) TargetVelocity = Vector3.zero;
+                else TargetVelocity = diff.normalized * MaxSpeed;
             }
-            else if (ControlMode == HorizontalControlMode.Velocity)
-            {
-                VelocityControl();
-            }
+            TargetVelocity.y = 0;
+            VelocityControl();
         }
 
         void VelocityControl()
         {
             Vector3 currentVelocity = robotBody.transform.InverseTransformVector(robotBody.velocity);
             currentVelocity.y = 0;
+            if(TargetVelocity.magnitude > MaxSpeed)
+            {
+                TargetVelocity = TargetVelocity.normalized * MaxSpeed;
+            }
 
             Vector3 force = velPID.UpdateVector3(TargetVelocity, currentVelocity, Time.fixedDeltaTime);
             force.y = 0;
 
-            if (MaxForce > 0f && force.magnitude > MaxForce)
-            {
-                force = force.normalized * MaxForce;
-            }
-
             robotBody.AddForceAtPosition(force, robotBody.transform.position, ForceMode.Force);
         }
-
-        void PositionHold()
-        {
-            Vector3 currentPosition = robotBody.transform.position;
-            currentPosition.y = 0;
-            Vector3 targetPos = TargetUnityPosition;
-            targetPos.y = 0;
-
-            Vector3 force = posPID.UpdateVector3(targetPos, currentPosition, Time.fixedDeltaTime);
-            force.y = 0;
-
-            if (MaxForce > 0f && force.magnitude > MaxForce)
-            {
-                force = force.normalized * MaxForce;
-            }
-
-            robotBody.AddForceAtPosition(force, robotBody.transform.position, ForceMode.Force);
-        }
-
 
     }
 }

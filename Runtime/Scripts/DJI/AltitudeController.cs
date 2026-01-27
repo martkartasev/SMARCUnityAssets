@@ -47,35 +47,26 @@ namespace dji
         PID velPID;
 
 
-        [Header("Position PID")]
-        public float PosKp = 2.0f;
-        public float PosKi = 0.5f;
-        public float PosKd = 1.0f;
-        public float PosIntegratorLimit = 5f; // limits integral term (in meter-seconds)
-        PID posPID;
-
 
 
         void Start()
         {
             robotBody = new MixedBody(RobotAB, RobotRB);
-            velPID = new PID(VelKp, VelKi, VelKd, VelIntegratorLimit);
-            posPID = new PID(PosKp, PosKi, PosKd, PosIntegratorLimit, AltitudeTolerance);
+            velPID = new PID(VelKp, VelKi, VelKd, VelIntegratorLimit, maxOutput: MaxForce);
         }
 
         void FixedUpdate()
         {
             if (ControlMode == AltitudeControlMode.AbsoluteAltitude)
             {
-                PositionHold();
+                float diff = TargetAltitude - (robotBody.transform.position.y - GroundLevel);
+                if (Mathf.Abs(diff) <= AltitudeTolerance) TargetVelocity = 0f;
+                else TargetVelocity = Mathf.Sign(diff) * ((diff > 0) ? AscentRate : DescentRate);
             }
-            else if (ControlMode == AltitudeControlMode.VerticalVelocity)
-            {
-                VelocityControl();
-            }
+            VelocityControl();
         }
 
-        float limitAccelation(float desiredAcc, float currentVel, float deltaTime)
+        float LimitAccelation(float desiredAcc, float currentVel, float deltaTime)
         {
             // limit acceleration so we don't instantly exceed configured ascent/descent rates
             float maxAccThisStepUp = (AscentRate - currentVel) / deltaTime;
@@ -85,7 +76,7 @@ namespace dji
             return Mathf.Clamp(desiredAcc, minAcc, maxAcc);
         }
 
-        float gravityCompensatedForce()
+        float DownForce()
         {
             float totalMass = robotBody.mass;
             foreach (float extraMass in ExtraMassesToCompensateFor)
@@ -99,29 +90,15 @@ namespace dji
         {
             float currentVel = robotBody.velocity.y;
             float pidAcc = velPID.Update(TargetVelocity, currentVel, Time.fixedDeltaTime);
-            pidAcc = limitAccelation(pidAcc, currentVel, Time.fixedDeltaTime);
+            pidAcc = LimitAccelation(pidAcc, currentVel, Time.fixedDeltaTime);
 
-            float requiredForce = CompensateGravity ? gravityCompensatedForce() : pidAcc;
+            float requiredForce = CompensateGravity ? pidAcc + DownForce() : pidAcc;
             requiredForce = MaxForce > 0f ? Mathf.Clamp(requiredForce, -MaxForce, MaxForce) : requiredForce;
 
             Vector3 upForce = Vector3.up * requiredForce;
             robotBody.AddForceAtPosition(upForce, robotBody.transform.position, ForceMode.Force);
         }
         
-
-        void PositionHold()
-        {
-            float currentAltitude = robotBody.transform.position.y - GroundLevel;
-            float pidAcc = posPID.Update(TargetAltitude, currentAltitude, Time.fixedDeltaTime);
-
-            if(pidAcc <= 0f) posPID.Reset();
-
-            float requiredForce = CompensateGravity ? gravityCompensatedForce() : pidAcc;
-            requiredForce = MaxForce > 0f ? Mathf.Clamp(requiredForce, -MaxForce, MaxForce) : requiredForce;
-
-            Vector3 upForce = Vector3.up * requiredForce;
-            robotBody.AddForceAtPosition(upForce, robotBody.transform.position, ForceMode.Force);
-        }
 
         void OnDrawGizmosSelected()
         {
