@@ -1,5 +1,6 @@
 using UnityEngine;
 using Force;
+using DefaultNamespace;
 
 
 namespace dji
@@ -32,8 +33,7 @@ namespace dji
         public float VelKi = 0.0f;
         public float VelKd = 0.0f;
         public float VelIntegratorLimit = 5f; // limits integral term (in meter-seconds)
-        private float velIntegrator = 0f;
-        private float velLastError = 0f;
+        PID velPID;
 
 
         [Header("Position PID")]
@@ -41,12 +41,13 @@ namespace dji
         public float PosKi = 0.5f;
         public float PosKd = 1.0f;
         public float PosIntegratorLimit = 5f; // limits integral term (in meter-seconds)
-        private float posIntegrator = 0f;
-        private float posLastError = 0f;
+        PID posPID;
 
         void Start()
         {
             droneBody = new MixedBody(droneAB, droneRB);
+            velPID = new PID(VelKp, VelKi, VelKd, VelIntegratorLimit);
+            posPID = new PID(PosKp, PosKi, PosKd, PosIntegratorLimit);
         }
 
         void FixedUpdate()
@@ -67,13 +68,7 @@ namespace dji
             Vector3 currentVelocity = droneBody.transform.InverseTransformVector(droneBody.velocity);
             currentVelocity.y = 0;
 
-            Vector3 error = TargetVelocity - currentVelocity;
-            velIntegrator += error.magnitude * Time.fixedDeltaTime;
-            velIntegrator = Mathf.Clamp(velIntegrator, -VelIntegratorLimit, VelIntegratorLimit);
-            float derivative = (error.magnitude - velLastError) / Time.fixedDeltaTime;
-            velLastError = error.magnitude;
-
-            Vector3 force = (VelKp * error) + (VelKi * velIntegrator * error.normalized) + (VelKd * derivative * error.normalized);
+            Vector3 force = velPID.UpdateVector3(TargetVelocity, currentVelocity, Time.fixedDeltaTime);
             force.y = 0;
 
             if (MaxForce > 0f && force.magnitude > MaxForce)
@@ -91,13 +86,7 @@ namespace dji
             Vector3 targetPos = TargetUnityPosition;
             targetPos.y = 0;
 
-            Vector3 error = targetPos - currentPosition;
-            posIntegrator += error.magnitude * Time.fixedDeltaTime;
-            posIntegrator = Mathf.Clamp(posIntegrator, -PosIntegratorLimit, PosIntegratorLimit);
-            float derivative = (error.magnitude - posLastError) / Time.fixedDeltaTime;
-            posLastError = error.magnitude;
-
-            Vector3 force = (PosKp * error) + (PosKi * posIntegrator * error.normalized) + (PosKd * derivative * error.normalized);
+            Vector3 force = posPID.UpdateVector3(targetPos, currentPosition, Time.fixedDeltaTime);
             force.y = 0;
 
             if (MaxForce > 0f && force.magnitude > MaxForce)
