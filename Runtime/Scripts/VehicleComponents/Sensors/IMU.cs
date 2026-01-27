@@ -35,7 +35,7 @@ namespace VehicleComponents.Sensors
             }
 
             // Use MixedBody to handle both Rigidbody and ArticulationBody
-            localVelocity = mixedBody.transform.InverseTransformVector(mixedBody.velocity);
+            localVelocity = mixedBody.localVelocity;
 
             if (deltaTime > 0)
             {

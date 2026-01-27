@@ -125,6 +125,12 @@ namespace Force
                 else rb.linearVelocity = value;
             }
         }
+
+        public Vector3 localVelocity
+        {
+            get {return transform.InverseTransformVector(velocity); }
+            set {velocity = transform.TransformVector(value); }
+        }
         
         public Vector3 position
         {

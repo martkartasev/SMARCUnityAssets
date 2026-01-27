@@ -22,6 +22,7 @@ namespace dji
 
         [Header("Velocity Controller")]
         public Vector3 TargetVelocity = Vector3.zero;
+
         [Header("Unity Position Controller")]
         public Vector3 TargetUnityPosition = Vector3.zero;
         public float PositionTolerance = 0.5f;
@@ -33,6 +34,8 @@ namespace dji
         public float VelKd = 0.0f;
         public float VelIntegratorLimit = 5f;
         PID velPID;
+        
+        public Vector3 LastAppliedForce { get; private set; }
 
 
         void Start()
@@ -72,6 +75,7 @@ namespace dji
             force.y = 0;
 
             robotBody.AddForceAtPosition(force, robotBody.transform.position, ForceMode.Force);
+            LastAppliedForce = force;
         }
 
     }
