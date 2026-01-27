@@ -58,11 +58,11 @@ namespace dji
             }
             else if (controlMode == HorizontalControlMode.Velocity)
             {
-                FLUVelocityControl();
+                VelocityControl();
             }
         }
 
-        void FLUVelocityControl()
+        void VelocityControl()
         {
             Vector3 currentVelocity = droneBody.transform.InverseTransformVector(droneBody.velocity);
             currentVelocity.y = 0;
