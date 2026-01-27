@@ -14,10 +14,10 @@ namespace dji
     
     public class YawController : MonoBehaviour
     {
-        public ArticulationBody droneAB;
-        public Rigidbody droneRB;
-        private MixedBody droneBody;
-        public YawControlMode controlMode = YawControlMode.CompassHeading;
+        public ArticulationBody RobotAB;
+        public Rigidbody RobotRB;
+        private MixedBody robotBody;
+        public YawControlMode ControlMode = YawControlMode.CompassHeading;
 
         [Tooltip("Set to 0 to disable torque capping")]
         public float MaxTorque = 1f; // 0 = no explicit torque cap
@@ -48,18 +48,18 @@ namespace dji
 
         void Start()
         {
-            droneBody = new MixedBody(droneAB, droneRB);
+            robotBody = new MixedBody(RobotAB, RobotRB);
             yawRatePID = new PID(YawRateKp, YawRateKi, YawRateKd, YawRateIntegratorLimit, Tolerance);
             headingPID = new PID(HeadingKp, HeadingKi, HeadingKd, HeadingIntegratorLimit, Tolerance);
         }
 
         void FixedUpdate()
         {
-            if (controlMode == YawControlMode.CompassHeading)
+            if (ControlMode == YawControlMode.CompassHeading)
             {
                 HeadingHold();
             }
-            else if (controlMode == YawControlMode.YawRate)
+            else if (ControlMode == YawControlMode.YawRate)
             {
                 YawRateHold();
             }
@@ -68,7 +68,7 @@ namespace dji
         void YawRateHold()
         {
             // Get current yaw rate in degrees per second
-            float currentYawRate = droneBody.angularVelocity.y * Mathf.Rad2Deg;
+            float currentYawRate = robotBody.angularVelocity.y * Mathf.Rad2Deg;
             float torque = yawRatePID.Update(TargetYawRate, currentYawRate, Time.fixedDeltaTime);
 
             if (MaxTorque > 0f)
@@ -76,12 +76,12 @@ namespace dji
                 torque = Mathf.Clamp(torque, -MaxTorque, MaxTorque);
             }
             // Apply torque around the Y-axis (yaw)
-            droneBody.AddTorque(new Vector3(0f, torque, 0f), ForceMode.Force);    
+            robotBody.AddTorque(new Vector3(0f, torque, 0f), ForceMode.Force);    
         }
 
         void HeadingHold()
         {
-            float currentHeading = droneBody.transform.eulerAngles.y;
+            float currentHeading = robotBody.transform.eulerAngles.y;
             // Compute shortest angle difference, so that PID doesn't try to spin the long way around
             float angleDifference = Mathf.DeltaAngle(currentHeading, TargetCompassHeading);
             float torque = headingPID.Update(angleDifference, 0f, Time.fixedDeltaTime);
@@ -91,7 +91,7 @@ namespace dji
                 torque = Mathf.Clamp(torque, -MaxTorque, MaxTorque);
             }
             // Apply torque around the Y-axis (yaw)
-            droneBody.AddTorque(new Vector3(0f, torque, 0f), ForceMode.Force);    
+            robotBody.AddTorque(new Vector3(0f, torque, 0f), ForceMode.Force);    
         }
     }
 }

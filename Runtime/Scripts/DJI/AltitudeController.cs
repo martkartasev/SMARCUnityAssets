@@ -1,6 +1,8 @@
 using UnityEngine;
 using Force;
 using DefaultNamespace;
+using UnityEditor.EditorTools;
+using System.Collections.Generic;
 
 
 namespace dji
@@ -12,10 +14,15 @@ namespace dji
     }
     public class AltitudeController : MonoBehaviour
     {
-        public ArticulationBody droneAB;
-        public Rigidbody droneRB;
-        private MixedBody droneBody;
-        public AltitudeControlMode controlMode = AltitudeControlMode.AbsoluteAltitude;
+        public ArticulationBody RobotAB;
+        public Rigidbody RobotRB;
+        private MixedBody robotBody;
+
+        public AltitudeControlMode ControlMode = AltitudeControlMode.AbsoluteAltitude;
+        [Tooltip("If true, controller will add force to compensate for gravity, this makes the robot float by default")]
+        public bool CompensateGravity = true;
+        [Tooltip("Additional masses (in kg) to compensate for when computing required lift force")]
+        public List<float> ExtraMassesToCompensateFor = new();
 
         public float AscentRate = 2.0f;
         public float DescentRate = 2.0f;
@@ -51,18 +58,18 @@ namespace dji
 
         void Start()
         {
-            droneBody = new MixedBody(droneAB, droneRB);
+            robotBody = new MixedBody(RobotAB, RobotRB);
             velPID = new PID(VelKp, VelKi, VelKd, VelIntegratorLimit);
             posPID = new PID(PosKp, PosKi, PosKd, PosIntegratorLimit, AltitudeTolerance);
         }
 
         void FixedUpdate()
         {
-            if (controlMode == AltitudeControlMode.AbsoluteAltitude)
+            if (ControlMode == AltitudeControlMode.AbsoluteAltitude)
             {
                 PositionHold();
             }
-            else if (controlMode == AltitudeControlMode.VerticalVelocity)
+            else if (ControlMode == AltitudeControlMode.VerticalVelocity)
             {
                 VelocityControl();
             }
@@ -78,46 +85,42 @@ namespace dji
             return Mathf.Clamp(desiredAcc, minAcc, maxAcc);
         }
 
+        float gravityCompensatedForce()
+        {
+            float totalMass = robotBody.mass;
+            foreach (float extraMass in ExtraMassesToCompensateFor)
+            {
+                totalMass += extraMass;
+            }
+            return totalMass * -Physics.gravity.y; // Physics.gravity.y is negative for "down"
+        }
+
         void VelocityControl()
         {
-            float currentVel = droneBody.velocity.y;
+            float currentVel = robotBody.velocity.y;
             float pidAcc = velPID.Update(TargetVelocity, currentVel, Time.fixedDeltaTime);
             pidAcc = limitAccelation(pidAcc, currentVel, Time.fixedDeltaTime);
 
-            // Compensate gravity: required force = m * (desiredAccel - gravity)
-            float g = Physics.gravity.y; // negative
-            float requiredForce = droneBody.mass * (pidAcc - g);
-
-            if (MaxForce > 0f)
-            {
-                requiredForce = Mathf.Clamp(requiredForce, -MaxForce, MaxForce);
-            }
+            float requiredForce = CompensateGravity ? gravityCompensatedForce() : pidAcc;
+            requiredForce = MaxForce > 0f ? Mathf.Clamp(requiredForce, -MaxForce, MaxForce) : requiredForce;
 
             Vector3 upForce = Vector3.up * requiredForce;
-            droneBody.AddForceAtPosition(upForce, droneBody.transform.position, ForceMode.Force);
+            robotBody.AddForceAtPosition(upForce, robotBody.transform.position, ForceMode.Force);
         }
         
 
         void PositionHold()
         {
-            float currentAltitude = droneBody.transform.position.y - GroundLevel;
+            float currentAltitude = robotBody.transform.position.y - GroundLevel;
             float pidAcc = posPID.Update(TargetAltitude, currentAltitude, Time.fixedDeltaTime);
 
             if(pidAcc <= 0f) posPID.Reset();
 
-            pidAcc = limitAccelation(pidAcc, droneBody.velocity.y, Time.fixedDeltaTime);
-
-            // Compensate gravity: required force = m * (desiredAccel - gravity)
-            float g = Physics.gravity.y; // negative (e.g. -9.81)
-            float requiredForce = droneBody.mass * (pidAcc - g);
-
-            if (MaxForce > 0f)
-            {
-                requiredForce = Mathf.Clamp(requiredForce, -MaxForce, MaxForce);
-            }
+            float requiredForce = CompensateGravity ? gravityCompensatedForce() : pidAcc;
+            requiredForce = MaxForce > 0f ? Mathf.Clamp(requiredForce, -MaxForce, MaxForce) : requiredForce;
 
             Vector3 upForce = Vector3.up * requiredForce;
-            droneBody.AddForceAtPosition(upForce, droneBody.transform.position, ForceMode.Force);
+            robotBody.AddForceAtPosition(upForce, robotBody.transform.position, ForceMode.Force);
         }
 
         void OnDrawGizmosSelected()
@@ -125,10 +128,10 @@ namespace dji
             // Draw target altitude line
             Gizmos.color = Color.green;
             Transform tf = this.transform;
-            if(droneAB != null)
-                tf = droneAB.transform;
-            else if(droneRB != null)
-                tf = droneRB.transform;
+            if(RobotAB != null)
+                tf = RobotAB.transform;
+            else if(RobotRB != null)
+                tf = RobotRB.transform;
             Vector3 startPos = tf.position;
             Vector3 endPos = new(tf.position.x, GroundLevel + TargetAltitude, tf.position.z);
             Gizmos.DrawLine(startPos, endPos);
