@@ -10,13 +10,21 @@ namespace dji
         CompassHeading,
         YawRate
     }
+
+    public enum RollPitchMode
+    {
+        Upright,
+        ReactToAcceleration
+    }
     
-    public class YawController : MonoBehaviour
+    public class AttitudeController : MonoBehaviour
     {
         public ArticulationBody RobotAB;
         public Rigidbody RobotRB;
         private MixedBody robotBody;
         public YawControlMode ControlMode = YawControlMode.CompassHeading;
+        public RollPitchMode RollPitchMode = RollPitchMode.Upright;
+
 
         [Tooltip("Set to 0 to disable torque capping")]
         public float MaxTorque = 1f; // 0 = no explicit torque cap
@@ -44,6 +52,14 @@ namespace dji
         public float HeadingIntegratorLimit = 10f; // limits integral term (in degree-seconds)
         private PID headingPID;
 
+        [Header("Reactive Roll/Pitch Settings")]
+        public HorizontalController horizontalController;
+        public float MaxTiltAngle = 20f;
+        public float ExpectedMaxAccel = 10f;
+        public float Kp = 1.0f;
+        
+
+
 
         void Start()
         {
@@ -54,6 +70,14 @@ namespace dji
 
         void FixedUpdate()
         {
+            // check if the robot is upright enough to control
+            var upDot = Vector3.Dot(robotBody.transform.up, Vector3.up);
+            if (upDot < 0.5f)
+            {
+                Debug.Log($"Robot too tilted for yaw control! upDot: {upDot}");
+                return;
+            }
+
             if (ControlMode == YawControlMode.CompassHeading)
             {
                 HeadingHold();
