@@ -36,6 +36,7 @@ namespace dji
 
         [Header("Compass Heading Controller")]
         public float TargetCompassHeading = 0.0f; // Target heading in degrees
+        public float DesiredYawRate = 10f;
 
         [Header("Yaw Rate PID")]
         public float YawRateKp = 0.1f;
@@ -44,13 +45,6 @@ namespace dji
         public float YawRateIntegratorLimit = 10f; // limits integral term (in degree-seconds)
         private PID yawRatePID;
 
-
-        [Header("Heading PID")]
-        public float HeadingKp = 2.0f;
-        public float HeadingKi = 0.5f;
-        public float HeadingKd = 1.0f;
-        public float HeadingIntegratorLimit = 10f; // limits integral term (in degree-seconds)
-        private PID headingPID;
 
         [Header("Reactive Roll/Pitch Settings")]
         public HorizontalController horizontalController;
@@ -64,15 +58,19 @@ namespace dji
         void Start()
         {
             robotBody = new MixedBody(RobotAB, RobotRB);
-            yawRatePID = new PID(YawRateKp, YawRateKi, YawRateKd, YawRateIntegratorLimit, Tolerance);
-            headingPID = new PID(HeadingKp, HeadingKi, HeadingKd, HeadingIntegratorLimit, Tolerance);
+            yawRatePID = new PID(YawRateKp, YawRateKi, YawRateKd, YawRateIntegratorLimit, Tolerance, MaxTorque);
         }
 
         void FixedUpdate()
         {
-            // check if the robot is upright enough to control
+            float upDotLimit = 0.5f;
             var upDot = Vector3.Dot(robotBody.transform.up, Vector3.up);
-            if (upDot < 0.5f)
+            if (RollPitchMode == RollPitchMode.Upright || upDot >= upDotLimit)
+            {                 
+                Upright();
+            }
+            // check if the robot is upright enough to control
+            if (upDot < upDotLimit)
             {
                 Debug.Log($"Robot too tilted for yaw control! upDot: {upDot}");
                 return;
@@ -80,12 +78,18 @@ namespace dji
 
             if (ControlMode == YawControlMode.CompassHeading)
             {
-                HeadingHold();
+                float currentHeading = robotBody.transform.eulerAngles.y;
+                // Compute shortest angle difference, so that PID doesn't try to spin the long way around
+                float angleDifference = Mathf.DeltaAngle(currentHeading, TargetCompassHeading);
+                if (Mathf.Abs(angleDifference) <= Tolerance) TargetYawRate = 0f;
+                else TargetYawRate = Mathf.Sign(angleDifference) * DesiredYawRate;
             }
-            else if (ControlMode == YawControlMode.YawRate)
-            {
-                YawRateHold();
-            }
+            YawRateHold();
+        }
+
+        void Upright()
+        {
+            
         }
         
         void YawRateHold()
@@ -93,26 +97,6 @@ namespace dji
             // Get current yaw rate in degrees per second
             float currentYawRate = robotBody.angularVelocity.y * Mathf.Rad2Deg;
             float torque = yawRatePID.Update(TargetYawRate, currentYawRate, Time.fixedDeltaTime);
-
-            if (MaxTorque > 0f)
-            {
-                torque = Mathf.Clamp(torque, -MaxTorque, MaxTorque);
-            }
-            // Apply torque around the Y-axis (yaw)
-            robotBody.AddTorque(new Vector3(0f, torque, 0f), ForceMode.Force);    
-        }
-
-        void HeadingHold()
-        {
-            float currentHeading = robotBody.transform.eulerAngles.y;
-            // Compute shortest angle difference, so that PID doesn't try to spin the long way around
-            float angleDifference = Mathf.DeltaAngle(currentHeading, TargetCompassHeading);
-            float torque = headingPID.Update(angleDifference, 0f, Time.fixedDeltaTime);
-
-            if (MaxTorque > 0f)
-            {
-                torque = Mathf.Clamp(torque, -MaxTorque, MaxTorque);
-            }
             // Apply torque around the Y-axis (yaw)
             robotBody.AddTorque(new Vector3(0f, torque, 0f), ForceMode.Force);    
         }
