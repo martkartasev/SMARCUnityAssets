@@ -1,6 +1,7 @@
 using UnityEngine;
 using Force;
 using DefaultNamespace;
+using UnityEngine.InputSystem;
 
 
 namespace dji
@@ -11,9 +12,9 @@ namespace dji
         YawRate
     }
 
-    public enum RollPitchMode
+    public enum TiltMode
     {
-        Upright,
+        TargetUp,
         ReactToAcceleration
     }
     
@@ -22,24 +23,27 @@ namespace dji
         public ArticulationBody RobotAB;
         public Rigidbody RobotRB;
         private MixedBody robotBody;
-        public YawControlMode YawControlMode = YawControlMode.CompassHeading;
-        public RollPitchMode RollPitchMode = RollPitchMode.Upright;
 
-
-        [Tooltip("Set to 0 to disable torque capping")]
-        public float MaxTorque = 1f; // 0 = no explicit torque cap
         [Tooltip("Acceptable tolerance in degrees")]
         public float Tolerance = 2.0f;
 
         [Header("Yaw Rate Controller")]
+        public YawControlMode YawControlMode = YawControlMode.CompassHeading;
+        [Tooltip("Set to 0 to disable torque capping")]
+        public float MaxTorqueYaw = 1f;
         public float TargetYawRate = 0.0f; // Target yaw rate in degrees per second
 
         [Header("Compass Heading Controller")]
         public float TargetCompassHeading = 0.0f; // Target heading in degrees
         public float DesiredYawRate = 10f;
 
-        [Header("RollPitch Controller")]
+
+        [Header("Tilt Controller")]
+        public TiltMode TiltMode = TiltMode.TargetUp;
+        [Tooltip("Set to 0 to disable torque capping")]
+        public float MaxTorqueTilt = 5f; 
         public Vector3 TargetUp = Vector3.up;
+
 
         [Header("Yaw Rate PID")]
         public float YawRateKp = 0.1f;
@@ -49,40 +53,60 @@ namespace dji
         private PID yawRatePID;
 
 
-        [Header("RollPitch PID")]
-        public float RollPitchKp = 1.0f;
-        public float RollPitchKi = 0.0f;
-        public float RollPitchKd = 0.0f;
-        public float RollPitchIntegratorLimit = 10f; // limits integral term (in degree-seconds)
-        private PID rollPitchPID;
+        [Header("Tilt PID")]
+        public float TiltKp = 10.0f;
+        public float TiltKi = 0.0f;
+        public float TiltKd = 1.0f;
+        public float TiltIntegratorLimit = 10f; // limits integral term (in degree-seconds)
+        private PID tiltPID;
 
 
-        [Header("Reactive Roll/Pitch Settings")]
+        [Header("Reactive Tilt Settings")]
         public HorizontalController horizontalController;
         public float MaxTiltAngle = 20f;
         public float ExpectedMaxAccel = 10f;
-        public float Kp = 1.0f;
 
         
+        [Header("Debug")]
+        public bool EnableKeyboardControl = false;
 
 
 
         void Start()
         {
             robotBody = new MixedBody(RobotAB, RobotRB);
-            yawRatePID = new PID(YawRateKp, YawRateKi, YawRateKd, YawRateIntegratorLimit, Tolerance, MaxTorque);
-            rollPitchPID = new PID(RollPitchKp, RollPitchKi, RollPitchKd, RollPitchIntegratorLimit, Tolerance, MaxTorque);
+            yawRatePID = new PID(YawRateKp, YawRateKi, YawRateKd, YawRateIntegratorLimit, Tolerance, MaxTorqueYaw);
+            tiltPID = new PID(TiltKp, TiltKi, TiltKd, TiltIntegratorLimit, Tolerance, MaxTorqueTilt);
         }
 
         void FixedUpdate()
         {
             float upDotLimit = 0.5f;
             var upDot = Vector3.Dot(robotBody.transform.up, Vector3.up);
-            if (RollPitchMode == RollPitchMode.Upright || upDot >= upDotLimit)
-            {                 
-                Upright();
+
+            if (TiltMode == TiltMode.ReactToAcceleration && upDot >= upDotLimit)
+            {
+                Vector3 appliedForce = horizontalController.LastAppliedForce;
+                appliedForce.y = 0; // should already be, but just to be safe
+                float mag = appliedForce.magnitude;
+                float targetTiltAngle = 0f;
+                if (mag > 0.05f)
+                {
+                    targetTiltAngle = mag / ExpectedMaxAccel * MaxTiltAngle;
+                }
+            
+                // keep the target angle within -180 to 180 range
+                if (Mathf.Abs(targetTiltAngle) > 180f) targetTiltAngle -= Mathf.Sign(targetTiltAngle) * 360f;
+
+                Vector3 tiltAxis = Vector3.Cross(Vector3.up, appliedForce.normalized);
+                Quaternion targetRotation = Quaternion.AngleAxis(targetTiltAngle, tiltAxis);
+                TargetUp = targetRotation * Vector3.up;
             }
 
+            // if the robot is too tilted, just try to upright it first
+            if (upDot < upDotLimit) TargetUp = Vector3.up;
+            
+            TiltControl();
 
             // check if the robot is upright enough to control the yaw of
             if (upDot < upDotLimit)
@@ -99,10 +123,18 @@ namespace dji
                 if (Mathf.Abs(angleDifference) <= Tolerance) TargetYawRate = 0f;
                 else TargetYawRate = Mathf.Sign(angleDifference) * DesiredYawRate;
             }
+
+            if (EnableKeyboardControl)
+            {
+                TargetYawRate = 0f;
+                if (Keyboard.current.qKey.isPressed) TargetYawRate = -DesiredYawRate;
+                if (Keyboard.current.eKey.isPressed) TargetYawRate = DesiredYawRate;
+            }
+
             YawRateControl();
         }
 
-        void Upright()
+        void TiltControl()
         {
             // Angle and axis to rotate current  -> target
             Vector3 currentUp = robotBody.transform.up;
@@ -147,10 +179,12 @@ namespace dji
             float dot2 = Mathf.Clamp(Vector3.Dot(robotBody.transform.up, TargetUp), -1f, 1f);
             float errorDeg = Mathf.Acos(dot2) * Mathf.Rad2Deg;
 
+            // Negative sign because desired torque is opposite to the error direction
+            float torqueMag = -tiltPID.Update(0f, errorDeg, Time.fixedDeltaTime);
             // Proportional torque around the corrective axis (world space)
             Vector3 correctiveAxis = axis / axisMag;
-            float torqueMag = rollPitchPID.Update(0f, -errorDeg, Time.fixedDeltaTime);
             Vector3 torque = correctiveAxis * torqueMag;
+            Debug.Log($"TiltControl: errorDeg: {errorDeg}, axis: {correctiveAxis}, torqueMag: {torqueMag}, torque: {torque}");
 
             // Apply torque to right the robot (apply in world space)
             robotBody.AddTorque(torque, ForceMode.Force);
@@ -189,7 +223,7 @@ namespace dji
             if(YawControlMode == YawControlMode.YawRate)
             {
                 Gizmos.color = Color.blue;
-                Vector3 yawDir = Quaternion.Euler(0f, robotBody.transform.eulerAngles.y + TargetYawRate, 0f) * Vector3.forward;
+                Vector3 yawDir = Quaternion.Euler(0f, tf.eulerAngles.y + TargetYawRate, 0f) * Vector3.forward;
                 Vector3 yawEndPos = tf.position + yawDir.normalized * 2.0f;
                 Gizmos.DrawLine(startPos, yawEndPos);
             }
