@@ -1,10 +1,9 @@
 using UnityEngine;
 using Force;
-using DefaultNamespace;
 using UnityEngine.InputSystem;
 
 
-namespace dji
+namespace smarc.genericControllers
 {
     public enum YawControlMode
     {
@@ -18,6 +17,7 @@ namespace dji
         ReactToAcceleration
     }
     
+    [AddComponentMenu("Smarc/Generic Controllers/Attitude Controller")]
     public class AttitudeController : MonoBehaviour
     {
         public ArticulationBody RobotAB;

@@ -1,16 +1,17 @@
 using UnityEngine;
 using Force;
-using DefaultNamespace;
 using System.Collections.Generic;
 
 
-namespace dji
+namespace smarc.genericControllers
 {
     public enum AltitudeControlMode
     {
         AbsoluteAltitude,
         VerticalVelocity
     }
+
+    [AddComponentMenu("Smarc/Generic Controllers/Altitude Controller")]
     public class AltitudeController : MonoBehaviour
     {
         public ArticulationBody RobotAB;

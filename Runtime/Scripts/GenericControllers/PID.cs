@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DefaultNamespace
+namespace smarc.genericControllers
 {
     class PID
     {

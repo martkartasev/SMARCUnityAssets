@@ -1,10 +1,9 @@
 using UnityEngine;
 using Force;
-using DefaultNamespace;
 using UnityEngine.InputSystem;
 
 
-namespace dji
+namespace smarc.genericControllers
 {
     public enum HorizontalControlMode
     {
@@ -12,6 +11,7 @@ namespace dji
         Velocity
     }
 
+    [AddComponentMenu("Smarc/Generic Controllers/Horizontal Controller")]
     public class HorizontalController : MonoBehaviour
     {
         public ArticulationBody RobotAB;
