@@ -10,13 +10,13 @@ namespace M350.PSDK_ROS2
     public class PsdkTakeControlService : ROSBehaviour
     {
         bool registered = false;
-        DJIController controller = null;
+        SimplerDJIController controller = null;
 
 
         protected override void StartROS()
         {
             if(controller == null){
-                controller = GetComponentInParent<DJIController>();
+                controller = GetComponentInParent<SimplerDJIController>();
             }
             if (!registered)
             {
@@ -29,10 +29,10 @@ namespace M350.PSDK_ROS2
             TriggerResponse response = new();
 
             if(controller == null){
-                controller = GetComponentInParent<DJIController>();
+                controller = GetComponentInParent<SimplerDJIController>();
             }
             if(controller != null){
-                controller.ControllerType = ControllerType.FLU_Velocity;
+                controller.TakeControl();
                 response.success = true;
                 return response;
             }

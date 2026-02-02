@@ -11,30 +11,29 @@ namespace M350.PSDK_ROS2
     {
 
         bool registered = false;
-        DJIController controller = null;
+        SimplerDJIController controller = null;
 
 
         protected override void StartROS()
         {
             if(controller == null){
-                controller = GetComponentInParent<DJIController>();
+                controller = GetComponentInParent<SimplerDJIController>();
             }
             if (!registered)
             {
-                rosCon.ImplementService<TriggerRequest, TriggerResponse>(topic, _take_control_callback);
+                rosCon.ImplementService<TriggerRequest, TriggerResponse>(topic, _release_control_callback);
                 registered = true;
             }
         }
 
-        private TriggerResponse _take_control_callback(TriggerRequest request){
+        private TriggerResponse _release_control_callback(TriggerRequest request){
             TriggerResponse response = new();
 
             if(controller == null){
-                controller = GetComponentInParent<DJIController>();
+                controller = GetComponentInParent<SimplerDJIController>();
             }
             if(controller != null){
-                controller.TargetAlt = controller.Position.y;
-                controller.ControllerType = ControllerType.FLU_Attitude;
+                controller.ReleaseControl();
                 response.success = true;
                 return response;
             }

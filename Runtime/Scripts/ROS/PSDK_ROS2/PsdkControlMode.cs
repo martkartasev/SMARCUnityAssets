@@ -10,28 +10,18 @@ namespace M350.PSDK_ROS2
     [AddComponentMenu("Smarc/PSDK_ROS/PsdkControlMode")]
     public class PsdkControlMode : ROSPublisher<ControlModeMsg>
     {
-        private DJIController controller = null;
-
-        protected override void InitPublisher(){
-            controller = GetComponentInParent<DJIController>(); //Get current control state from the controller itself
+        SimplerDJIController controller;
+        protected override void InitPublisher()
+        {
+            controller = GetComponentInParent<SimplerDJIController>();
+            base.InitPublisher();
         }
 
         protected override void UpdateMessage()
         {
-            if(controller == null){
-                controller = GetComponentInParent<DJIController>();
-            }
-            if(controller != null){
-                if(controller.ControllerType == ControllerType.FLU_Attitude)
-                {
-                    ROSMsg.control_auth = 0;
-                }
-                else
-                {
-                    ROSMsg.control_auth = 1;
-                }
-                ROSMsg.device_mode = 4;
-            }
+            if (controller.GotControl) ROSMsg.control_auth = 1;
+            else ROSMsg.control_auth = 0;
+            ROSMsg.device_mode = 4;
         }
     }
 }

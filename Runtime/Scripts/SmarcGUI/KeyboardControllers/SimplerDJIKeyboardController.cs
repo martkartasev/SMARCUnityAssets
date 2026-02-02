@@ -30,6 +30,16 @@ namespace SmarcGUI.KeyboardControllers
             djiCtrl = GetComponent<SimplerDJIController>();
         }
 
+        void OnEnable()
+        {
+            djiCtrl.ReleaseControl();
+        }
+
+        void OnDisable()
+        {
+            djiCtrl.TakeControl();
+        }
+
         void Update()
         {
             var forwardValue = forwardAction.ReadValue<float>();
@@ -55,8 +65,6 @@ namespace SmarcGUI.KeyboardControllers
 
                     break;
                 case DroneFlightState.Idle:
-                    if (verticalValue > 0) djiCtrl.TakeOff();
-                    break;
                 case DroneFlightState.Landing:
                 case DroneFlightState.TakingOff:
                 default:

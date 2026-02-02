@@ -11,13 +11,13 @@ namespace M350.PSDK_ROS2
     public class PsdkTakeoffService : ROSBehaviour
     {
         bool registered = false;
-        IDJIController controller = null;
+        SimplerDJIController controller = null;
 
 
         protected override void StartROS()
         {
             if(controller == null){
-                controller = GetComponentInParent<IDJIController>();
+                controller = GetComponentInParent<SimplerDJIController>();
             }
             if (!registered)
             {
@@ -33,7 +33,7 @@ namespace M350.PSDK_ROS2
             if (controller == null)
             {
                 Debug.Log("Finding Controller Component");
-                controller = GetComponentInParent<IDJIController>();
+                controller = GetComponentInParent<SimplerDJIController>();
                 if (controller == null)
                 {
                     Debug.Log("Controller not found");
