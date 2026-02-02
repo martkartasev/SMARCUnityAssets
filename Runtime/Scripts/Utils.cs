@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Force;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using UnityEngine;
@@ -341,31 +342,8 @@ namespace DefaultNamespace
         /// </summary>
         public static Vector3 GetCenterOfMass(ArticulationBody ab, bool includeChildren = true)
         {
-            if (!includeChildren)
-            {
-                return ab.transform.position + ab.centerOfMass;
-            }
-
-            var com = (ab.transform.position + ab.centerOfMass) * ab.mass;
-            var totalMass = ab.mass;
-            var abs = ab.GetComponentsInChildren<ArticulationBody>();
-            foreach (var childAb in abs)
-            {
-                if (childAb == ab) continue; // Skip the root ArticulationBody
-                com += (childAb.transform.position + childAb.centerOfMass) * childAb.mass;
-                totalMass += childAb.mass;
-            }
-
-            if (totalMass > 0)
-            {
-                com /= totalMass;
-                return com;
-            }
-            else
-            {
-                Debug.LogWarning("Total mass is zero, cannot draw center of mass.");
-                return Vector3.zero; // Return zero vector if total mass is zero
-            }
+            MixedBody b = new(ab, null);
+            return b.GetTotalConnectedCenterOfMass(includeChildren);
         }
 
         

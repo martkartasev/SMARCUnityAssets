@@ -184,7 +184,6 @@ namespace smarc.genericControllers
             // Proportional torque around the corrective axis (world space)
             Vector3 correctiveAxis = axis / axisMag;
             Vector3 torque = correctiveAxis * torqueMag;
-            Debug.Log($"TiltControl: errorDeg: {errorDeg}, axis: {correctiveAxis}, torqueMag: {torqueMag}, torque: {torque}");
 
             // Apply torque to right the robot (apply in world space)
             robotBody.AddTorque(torque, ForceMode.Force);

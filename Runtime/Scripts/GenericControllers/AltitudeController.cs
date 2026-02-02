@@ -1,6 +1,7 @@
 using UnityEngine;
 using Force;
 using System.Collections.Generic;
+using DefaultNamespace;
 
 
 namespace smarc.genericControllers
@@ -21,8 +22,6 @@ namespace smarc.genericControllers
         public AltitudeControlMode ControlMode = AltitudeControlMode.AbsoluteAltitude;
         [Tooltip("If true, controller will add force to compensate for gravity, this makes the robot float by default")]
         public bool CompensateGravity = true;
-        [Tooltip("Additional masses (in kg) to compensate for when computing required lift force")]
-        public List<float> ExtraMassesToCompensateFor = new();
 
         public float AscentRate = 2.0f;
         public float DescentRate = 2.0f;
@@ -46,13 +45,21 @@ namespace smarc.genericControllers
         public float VelIntegratorLimit = 5f; // limits integral term (in meter-seconds)
         PID velPID;
 
-
+        // Use a generated object to apply force at center of mass, parented to the robot transform
+        // This way, we don't have to recalculate the world position of the COM every frame
+        Transform COM;
+        float totalMass;
 
 
         void Start()
         {
             robotBody = new MixedBody(RobotAB, RobotRB);
             velPID = new PID(VelKp, VelKi, VelKd, VelIntegratorLimit, maxOutput: MaxForce);
+            totalMass = robotBody.GetTotalConnectedMass();
+            var globalCom = robotBody.GetTotalConnectedCenterOfMass();
+            COM = new GameObject("AltitudeController_COM").transform;
+            COM.parent = robotBody.transform;
+            COM.position = globalCom;
         }
 
         void FixedUpdate()
@@ -76,15 +83,6 @@ namespace smarc.genericControllers
             return Mathf.Clamp(desiredAcc, minAcc, maxAcc);
         }
 
-        float DownForce()
-        {
-            float totalMass = robotBody.mass;
-            foreach (float extraMass in ExtraMassesToCompensateFor)
-            {
-                totalMass += extraMass;
-            }
-            return totalMass * -Physics.gravity.y; // Physics.gravity.y is negative for "down"
-        }
 
         void VelocityControl()
         {
@@ -92,11 +90,12 @@ namespace smarc.genericControllers
             float pidAcc = velPID.Update(TargetVelocity, currentVel, Time.fixedDeltaTime);
             pidAcc = LimitAccelation(pidAcc, currentVel, Time.fixedDeltaTime);
 
-            float requiredForce = CompensateGravity ? pidAcc + DownForce() : pidAcc;
+            float requiredForce = CompensateGravity ? pidAcc + totalMass * -Physics.gravity.y : pidAcc;
             requiredForce = MaxForce > 0f ? Mathf.Clamp(requiredForce, -MaxForce, MaxForce) : requiredForce;
 
             Vector3 upForce = Vector3.up * requiredForce;
-            robotBody.AddForceAtPosition(upForce, robotBody.transform.position, ForceMode.Force);
+            robotBody.AddForceAtPosition(upForce, COM.position, ForceMode.Force);
+            Debug.DrawRay(COM.position, upForce * 0.1f, Color.red);
         }
         
 
