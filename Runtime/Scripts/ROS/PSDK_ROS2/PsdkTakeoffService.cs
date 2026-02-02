@@ -7,17 +7,17 @@ using ROS.Core;
 
 namespace M350.PSDK_ROS2
 {
-    [UnityEngine.AddComponentMenu("Smarc/PSDK_ROS/PsdkTakeoffService")]
+    [AddComponentMenu("Smarc/PSDK_ROS/PsdkTakeoffService")]
     public class PsdkTakeoffService : ROSBehaviour
     {
         bool registered = false;
-        DJIController controller = null;
+        IDJIController controller = null;
 
 
         protected override void StartROS()
         {
             if(controller == null){
-                controller = GetComponentInParent<DJIController>();
+                controller = GetComponentInParent<IDJIController>();
             }
             if (!registered)
             {
@@ -33,7 +33,7 @@ namespace M350.PSDK_ROS2
             if (controller == null)
             {
                 Debug.Log("Finding Controller Component");
-                controller = GetComponentInParent<DJIController>();
+                controller = GetComponentInParent<IDJIController>();
                 if (controller == null)
                 {
                     Debug.Log("Controller not found");

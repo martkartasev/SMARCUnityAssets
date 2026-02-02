@@ -1,7 +1,5 @@
 using UnityEngine;
 using Force;
-using System.Collections.Generic;
-using DefaultNamespace;
 using UnityEngine.InputSystem;
 
 
@@ -52,9 +50,6 @@ namespace Smarc.GenericControllers
         float totalMass;
 
 
-        [Header("Debug")]
-        public bool EnableKeyboardControl = false;
-
 
         void Start()
         {
@@ -75,12 +70,7 @@ namespace Smarc.GenericControllers
                 if (Mathf.Abs(diff) <= AltitudeTolerance) TargetVelocity = 0f;
                 else TargetVelocity = Mathf.Sign(diff) * ((diff > 0) ? AscentRate : DescentRate);
             }
-            if (EnableKeyboardControl)
-            {
-                TargetVelocity = 0f;
-                if (Keyboard.current.upArrowKey.isPressed) TargetVelocity = AscentRate;
-                if (Keyboard.current.downArrowKey.isPressed) TargetVelocity = -DescentRate;
-            }
+            
             VelocityControl();
         }
 

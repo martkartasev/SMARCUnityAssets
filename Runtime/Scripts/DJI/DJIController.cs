@@ -17,7 +17,7 @@ namespace dji
         FLU_Attitude,
     }
 
-    public class DJIController : MonoBehaviour
+    public class DJIController : MonoBehaviour, IDJIController
     {
         [Header("Drone Components")]
         public ArticulationBody ComAB;
@@ -175,10 +175,6 @@ namespace dji
 
         void Awake()
         {
-            FL.HoverDefault = false;
-            BL.HoverDefault = false;
-            FR.HoverDefault = false;
-            BR.HoverDefault = false;
             FL.RPMMax = MaxRPM;
             BL.RPMMax = MaxRPM;
             FR.RPMMax = MaxRPM;

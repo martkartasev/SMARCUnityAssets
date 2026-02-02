@@ -38,8 +38,6 @@ namespace Smarc.GenericControllers
         
         public Vector3 LastAppliedForce { get; private set; }
 
-        [Header("Debug")]
-        public bool EnableKeyboardControl = false;
 
 
         // Use a generated object to apply force at center of mass, parented to the robot transform
@@ -90,21 +88,6 @@ namespace Smarc.GenericControllers
             }
             TargetVelocity.y = 0;
 
-            if(EnableKeyboardControl)
-            {
-                float inputZ = Keyboard.current.wKey.isPressed ? 1f : (Keyboard.current.sKey.isPressed ? -1f : 0f);
-                float inputX = Keyboard.current.dKey.isPressed ? 1f : (Keyboard.current.aKey.isPressed ? -1f : 0f);
-                Vector3 inputDir = new Vector3(inputX, 0, inputZ);
-                if(inputDir.magnitude > 0f)
-                {
-                    inputDir.Normalize();
-                    TargetVelocity = inputDir * MaxSpeed;
-                }
-                else
-                {
-                    TargetVelocity = Vector3.zero;
-                }
-            }
             VelocityControl();
         }
 

@@ -54,10 +54,6 @@ namespace Smarc.GenericControllers
         public float MaxTiltAngle = 20f;
         public float ExpectedMaxAccel = 10f;
 
-        
-        [Header("Debug")]
-        public bool EnableKeyboardControl = false;
-
 
 
         void Start()
@@ -109,13 +105,6 @@ namespace Smarc.GenericControllers
                 float angleDifference = Mathf.DeltaAngle(currentHeading, TargetCompassHeading);
                 if (Mathf.Abs(angleDifference) <= YawTolerance) TargetYawRate = 0f;
                 else TargetYawRate = Mathf.Sign(angleDifference) * DesiredYawRate;
-            }
-
-            if (EnableKeyboardControl)
-            {
-                TargetYawRate = 0f;
-                if (Keyboard.current.leftArrowKey.isPressed) TargetYawRate = -DesiredYawRate;
-                if (Keyboard.current.rightArrowKey.isPressed) TargetYawRate = DesiredYawRate;
             }
 
             // so far we just did tilt control, finally add the yaw.

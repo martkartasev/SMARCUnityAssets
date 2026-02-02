@@ -24,20 +24,24 @@ namespace VehicleComponents.Actuators
         public float RPMToForceMultiplier = 0.005f;
         public float RPMReverseMultiplier = 0.6f;
 
-        [Header("Drone Propeller")]
-        [Tooltip("If set, the propeller will try to hover at a default RPM when started. Assumes the props are all equally distant to the center of mass! If this is not the case, the drone will likely flip around :)")]
-        public bool HoverDefault = false;
-        public float DefaultHoverRPM;
+        [Header("Fake Spin")]
+        [Tooltip("If set, the propeller will ONLY visually spin, with the collider. No forces will be applied.")]
+        public bool FakeSpin = false;
+        public string VisualObjectName = "Visuals";
+        public string CollisionObjectName = "Collision";
+        Transform propVisual; // for fake spinning.
+        Transform propCollision; // for fake spinning.
 
+
+        [Header("Drone Propeller")]
         [Tooltip("Should the propeller apply manual torque? If unset, the propeller AB will be used to apply torque.")]
         public bool ApplyManualTorque = false;
         [Tooltip("Direction of torque")]
-        public bool ManualTorqueUp = false;
+        public bool ReverseManualTorque = false;
 
         public ArticulationBody baseLinkArticulationBody;
         public Rigidbody baseLinkRigidBody;
         private float c_tau_f = 8.004e-4f;
-        private MixedBody baseLinkMixedBody;
 
 
         void OnValidate()
@@ -51,14 +55,17 @@ namespace VehicleComponents.Actuators
         {
             if (Mathf.Abs(rpm) < RPMMin) rpm = 0;
             this.rpm = Mathf.Clamp(rpm, -RPMMax, RPMMax);
-            //if(hoverdefault) Debug.Log("setting rpm to: " + rpm);
         }
 
         new void Awake()
         {
             base.Awake();
-            baseLinkMixedBody = new MixedBody(baseLinkArticulationBody, baseLinkRigidBody);
-            if (HoverDefault) InitializeRPMToStayAfloat();
+            if (FakeSpin)
+            {
+                // find visual and collision children
+                propVisual = parentMixedBody.transform.Find(VisualObjectName);
+                propCollision = parentMixedBody.transform.Find(CollisionObjectName);
+            }
         }
 
         new void FixedUpdate()
@@ -70,11 +77,24 @@ namespace VehicleComponents.Actuators
         public void DoUpdate()
         {
             if (Mathf.Abs(rpm) < RPMMin) rpm = 0;
+            Vector3 forceDirection = orientation == PropellerOrientation.ZForward ? parentMixedBody.transform.forward : parentMixedBody.transform.up;
 
+            if (FakeSpin)
+            {
+                // just spin the visual and collision objects
+                if (propVisual != null)
+                {
+                    propVisual.Rotate(forceDirection, rpm * 6f * Time.fixedDeltaTime); // 6f to convert RPM to degrees per second
+                }
+                if (propCollision != null)
+                {
+                    propCollision.Rotate(forceDirection, rpm * 6f * Time.fixedDeltaTime);
+                }
+                return;
+            }
 
             float r = rpm * RPMToForceMultiplier * (rpm < 0 ? RPMReverseMultiplier : 1f);
 
-            Vector3 forceDirection = orientation == PropellerOrientation.ZForward ? parentMixedBody.transform.forward : parentMixedBody.transform.up;
             parentMixedBody.AddForceAtPosition(r * forceDirection,
                 parentMixedBody.transform.position,
                 ForceMode.Force);
@@ -84,7 +104,7 @@ namespace VehicleComponents.Actuators
             // and simulation is not wanted.
             if (ApplyManualTorque)
             {
-                int torque_sign = ManualTorqueUp ? 1 : -1;
+                int torque_sign = ReverseManualTorque ? 1 : -1;
                 float torque = torque_sign * c_tau_f * r;
                 Vector3 torqueVector = torque * transform.forward;
                 parentMixedBody.AddTorque(torqueVector, ForceMode.Force);
@@ -94,43 +114,6 @@ namespace VehicleComponents.Actuators
                 int direction = reverse ? -1 : 1;
                 parentMixedBody.SetDriveTargetVelocity(ArticulationDriveAxis.X, direction * rpm);
             }
-        }
-
-        private void InitializeRPMToStayAfloat()
-        {
-            // Find all child transforms including self
-            float totalMass = baseLinkMixedBody.mass;
-            var rbs = baseLinkMixedBody.transform.GetComponentsInChildren<Rigidbody>();
-            var abs = baseLinkMixedBody.transform.GetComponentsInChildren<ArticulationBody>();
-
-            // Calculate the total mass of all child objects
-            foreach (var rb in rbs) totalMass += rb.mass;
-            foreach (var ab in abs) totalMass += ab.mass;
-
-            // Calculate the required force to counteract gravity
-            float totalRequiredForce = totalMass * Physics.gravity.magnitude;
-
-            // Find all propeller objects under baseLinkMixedBody and calculate their angle from the global vertical axis
-            var propellers = baseLinkMixedBody.transform.GetComponentsInChildren<Propeller>();
-
-            // Calculate the required downward force per propeller
-            float requiredForcePerProp = totalRequiredForce / propellers.Length;
-
-            // Calculate the required RPM to achieve the desired force
-            // Assuming RPMToForceMultiplier is the conversion factor from RPM to force
-            // Take into account the orientation of the propeller
-            // If the propeller is not aligned with the global up direction, adjust the force
-            Vector3 globalUp = Vector3.up;
-            Vector3 propForward = orientation == PropellerOrientation.ZForward ? parentMixedBody.transform.forward : parentMixedBody.transform.up;
-            float alignment = Mathf.Abs(Vector3.Dot(globalUp.normalized, propForward.normalized));
-            if (alignment < 0.01f) alignment = 1f; // Avoid division by zero or too small values
-            var ownForce = requiredForcePerProp / alignment;
-
-            float requiredRPM = ownForce / RPMToForceMultiplier;
-            DefaultHoverRPM = requiredRPM;
-
-            // Set the initial RPM to each propeller
-            SetRpm(requiredRPM);
         }
 
         public bool HasNewData()
