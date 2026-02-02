@@ -3,7 +3,7 @@ using Force;
 using UnityEngine.InputSystem;
 
 
-namespace smarc.genericControllers
+namespace Smarc.GenericControllers
 {
     public enum HorizontalControlMode
     {
@@ -42,16 +42,27 @@ namespace smarc.genericControllers
         public bool EnableKeyboardControl = false;
 
 
+        // Use a generated object to apply force at center of mass, parented to the robot transform
+        // This way, we don't have to recalculate the world position of the COM every frame
+        Transform COM;
+
+
         void Start()
         {
             robotBody = new MixedBody(RobotAB, RobotRB);
             velPID = new PID(VelKp, VelKi, VelKd, VelIntegratorLimit, maxOutput:MaxForce);
 
+            var globalCom = robotBody.GetTotalConnectedCenterOfMass();
+            COM = new GameObject("HorizontalController_COM").transform;
+            COM.parent = robotBody.transform;
+            COM.position = globalCom;
+
             // set to current position so it doesnt try to fly away to (usually) origin lol
             if (ControlMode == HorizontalControlMode.UnityPosition)
             {
-                TargetUnityPosition = robotBody.transform.position;
+                TargetUnityPosition = COM.position;
             }
+
         }
 
         void FixedUpdate()
@@ -73,7 +84,7 @@ namespace smarc.genericControllers
 
             if (ControlMode == HorizontalControlMode.UnityPosition)
             {
-                Vector3 diff = TargetUnityPosition - robotBody.transform.position;
+                Vector3 diff = TargetUnityPosition - COM.position;
                 if (diff.magnitude <= PositionTolerance) TargetVelocity = Vector3.zero;
                 else TargetVelocity = diff.normalized * MaxSpeed;
             }
@@ -110,7 +121,7 @@ namespace smarc.genericControllers
             force.y = 0;
 
             force = robotBody.transform.TransformVector(force);
-            robotBody.AddForceAtPosition(force, robotBody.transform.position, ForceMode.Force);
+            robotBody.AddForceAtPosition(force, COM.position, ForceMode.Force);
             LastAppliedForce = force;
         }
 

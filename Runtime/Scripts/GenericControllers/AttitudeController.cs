@@ -3,7 +3,7 @@ using Force;
 using UnityEngine.InputSystem;
 
 
-namespace smarc.genericControllers
+namespace Smarc.GenericControllers
 {
     public enum YawControlMode
     {
@@ -16,7 +16,10 @@ namespace smarc.genericControllers
         TargetUp,
         ReactToAcceleration
     }
-    
+
+    /// <summary>
+    /// Attitude controller to control yaw and tilt of a robot using angular velocity commands.
+    /// </summary>
     [AddComponentMenu("Smarc/Generic Controllers/Attitude Controller")]
     public class AttitudeController : MonoBehaviour
     {
@@ -25,40 +28,25 @@ namespace smarc.genericControllers
         private MixedBody robotBody;
 
         [Tooltip("Acceptable tolerance in degrees")]
-        public float Tolerance = 2.0f;
+        public float YawTolerance = 2.0f;
+
 
         [Header("Yaw Rate Controller")]
         public YawControlMode YawControlMode = YawControlMode.CompassHeading;
-        [Tooltip("Set to 0 to disable torque capping")]
-        public float MaxTorqueYaw = 1f;
-        public float TargetYawRate = 0.0f; // Target yaw rate in degrees per second
+        public float TargetYawRate = 5.0f; // Target yaw rate in degrees per second
 
         [Header("Compass Heading Controller")]
         public float TargetCompassHeading = 0.0f; // Target heading in degrees
         public float DesiredYawRate = 10f;
 
 
+
         [Header("Tilt Controller")]
         public TiltMode TiltMode = TiltMode.TargetUp;
-        [Tooltip("Set to 0 to disable torque capping")]
-        public float MaxTorqueTilt = 5f; 
         public Vector3 TargetUp = Vector3.up;
+        public float TiltKp = 1.5f;
 
 
-        [Header("Yaw Rate PID")]
-        public float YawRateKp = 0.1f;
-        public float YawRateKi = 0.0f;
-        public float YawRateKd = 0.0f;
-        public float YawRateIntegratorLimit = 10f; // limits integral term (in degree-seconds)
-        private PID yawRatePID;
-
-
-        [Header("Tilt PID")]
-        public float TiltKp = 10.0f;
-        public float TiltKi = 0.0f;
-        public float TiltKd = 1.0f;
-        public float TiltIntegratorLimit = 10f; // limits integral term (in degree-seconds)
-        private PID tiltPID;
 
 
         [Header("Reactive Tilt Settings")]
@@ -75,14 +63,13 @@ namespace smarc.genericControllers
         void Start()
         {
             robotBody = new MixedBody(RobotAB, RobotRB);
-            yawRatePID = new PID(YawRateKp, YawRateKi, YawRateKd, YawRateIntegratorLimit, Tolerance, MaxTorqueYaw);
-            tiltPID = new PID(TiltKp, TiltKi, TiltKd, TiltIntegratorLimit, Tolerance, MaxTorqueTilt);
         }
 
         void FixedUpdate()
         {
             float upDotLimit = 0.5f;
             var upDot = Vector3.Dot(robotBody.transform.up, Vector3.up);
+            Vector3 angVel = Vector3.zero;
 
             if (TiltMode == TiltMode.ReactToAcceleration && upDot >= upDotLimit)
             {
@@ -92,7 +79,7 @@ namespace smarc.genericControllers
                 float targetTiltAngle = 0f;
                 if (mag > 0.05f)
                 {
-                    targetTiltAngle = mag / ExpectedMaxAccel * MaxTiltAngle;
+                    targetTiltAngle = Mathf.Clamp(mag, -ExpectedMaxAccel, ExpectedMaxAccel) / ExpectedMaxAccel * MaxTiltAngle;
                 }
             
                 // keep the target angle within -180 to 180 range
@@ -106,7 +93,7 @@ namespace smarc.genericControllers
             // if the robot is too tilted, just try to upright it first
             if (upDot < upDotLimit) TargetUp = Vector3.up;
             
-            TiltControl();
+            angVel += TiltControl();
 
             // check if the robot is upright enough to control the yaw of
             if (upDot < upDotLimit)
@@ -120,21 +107,23 @@ namespace smarc.genericControllers
                 float currentHeading = robotBody.transform.eulerAngles.y;
                 // Compute shortest angle difference, so that PID doesn't try to spin the long way around
                 float angleDifference = Mathf.DeltaAngle(currentHeading, TargetCompassHeading);
-                if (Mathf.Abs(angleDifference) <= Tolerance) TargetYawRate = 0f;
+                if (Mathf.Abs(angleDifference) <= YawTolerance) TargetYawRate = 0f;
                 else TargetYawRate = Mathf.Sign(angleDifference) * DesiredYawRate;
             }
 
             if (EnableKeyboardControl)
             {
                 TargetYawRate = 0f;
-                if (Keyboard.current.qKey.isPressed) TargetYawRate = -DesiredYawRate;
-                if (Keyboard.current.eKey.isPressed) TargetYawRate = DesiredYawRate;
+                if (Keyboard.current.leftArrowKey.isPressed) TargetYawRate = -DesiredYawRate;
+                if (Keyboard.current.rightArrowKey.isPressed) TargetYawRate = DesiredYawRate;
             }
 
-            YawRateControl();
+            // so far we just did tilt control, finally add the yaw.
+            angVel += Mathf.Deg2Rad * TargetYawRate * Vector3.up;
+            robotBody.angularVelocity = angVel;
         }
 
-        void TiltControl()
+        Vector3 TiltControl()
         {
             // Angle and axis to rotate current  -> target
             Vector3 currentUp = robotBody.transform.up;
@@ -174,30 +163,16 @@ namespace smarc.genericControllers
                 }
             }
             float axisMag = axis.magnitude;
-            if (axisMag < 1e-6f) return; // already aligned or numerically unstable
+            if (axisMag < 1e-6f) return Vector3.zero; // already aligned or numerically unstable
+            Vector3 correctiveAxis = axis / axisMag;
 
             float dot2 = Mathf.Clamp(Vector3.Dot(robotBody.transform.up, TargetUp), -1f, 1f);
             float errorDeg = Mathf.Acos(dot2) * Mathf.Rad2Deg;
-
-            // Negative sign because desired torque is opposite to the error direction
-            float torqueMag = -tiltPID.Update(0f, errorDeg, Time.fixedDeltaTime);
-            // Proportional torque around the corrective axis (world space)
-            Vector3 correctiveAxis = axis / axisMag;
-            Vector3 torque = correctiveAxis * torqueMag;
-
-            // Apply torque to right the robot (apply in world space)
-            robotBody.AddTorque(torque, ForceMode.Force);
+            Vector3 vel = TiltKp * errorDeg * Mathf.Deg2Rad * correctiveAxis;
+            return vel;
         }
         
-        void YawRateControl()
-        {
-            // Get current yaw rate in degrees per second
-            float currentYawRate = robotBody.angularVelocity.y * Mathf.Rad2Deg;
-            float torque = yawRatePID.Update(TargetYawRate, currentYawRate, Time.fixedDeltaTime);
-            // Apply torque around the Y-axis (yaw)
-            robotBody.AddTorque(new Vector3(0f, torque, 0f), ForceMode.Force);    
-        }
-
+       
         void OnDrawGizmosSelected()
         {
             // Draw target attitude line

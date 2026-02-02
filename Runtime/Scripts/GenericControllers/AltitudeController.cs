@@ -2,9 +2,10 @@ using UnityEngine;
 using Force;
 using System.Collections.Generic;
 using DefaultNamespace;
+using UnityEngine.InputSystem;
 
 
-namespace smarc.genericControllers
+namespace Smarc.GenericControllers
 {
     public enum AltitudeControlMode
     {
@@ -51,6 +52,10 @@ namespace smarc.genericControllers
         float totalMass;
 
 
+        [Header("Debug")]
+        public bool EnableKeyboardControl = false;
+
+
         void Start()
         {
             robotBody = new MixedBody(RobotAB, RobotRB);
@@ -69,6 +74,12 @@ namespace smarc.genericControllers
                 float diff = TargetAltitude - (robotBody.transform.position.y - GroundLevel);
                 if (Mathf.Abs(diff) <= AltitudeTolerance) TargetVelocity = 0f;
                 else TargetVelocity = Mathf.Sign(diff) * ((diff > 0) ? AscentRate : DescentRate);
+            }
+            if (EnableKeyboardControl)
+            {
+                TargetVelocity = 0f;
+                if (Keyboard.current.upArrowKey.isPressed) TargetVelocity = AscentRate;
+                if (Keyboard.current.downArrowKey.isPressed) TargetVelocity = -DescentRate;
             }
             VelocityControl();
         }

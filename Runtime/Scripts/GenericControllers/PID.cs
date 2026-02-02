@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace smarc.genericControllers
+namespace Smarc.GenericControllers
 {
     class PID
     {
