@@ -5,14 +5,14 @@ using dji;
 
 namespace Editor.Scripts
 {
-    [CustomEditor(typeof(SimplerDJIController))]
+    [CustomEditor(typeof(DJIController))]
     public class DJIControllerEditor : UnityEditor.Editor
     {
-        SimplerDJIController container;
+        DJIController container;
 
         public override void OnInspectorGUI()
         {
-            container = (SimplerDJIController)target;
+            container = (DJIController)target;
             DrawDefaultInspector();
 
             if (GUILayout.Button("TakeOff"))

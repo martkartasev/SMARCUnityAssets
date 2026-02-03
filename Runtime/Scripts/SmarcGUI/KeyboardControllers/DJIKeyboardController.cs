@@ -8,14 +8,14 @@ namespace SmarcGUI.KeyboardControllers
     [RequireComponent(typeof(AltitudeController))]
     [RequireComponent(typeof(AttitudeController))]
     [RequireComponent(typeof(HorizontalController))]
-    [RequireComponent(typeof(SimplerDJIController))]
-    public class SimplerDJIKeyboardController : KeyboardControllerBase
+    [RequireComponent(typeof(DJIController))]
+    public class DJIKeyboardController : KeyboardControllerBase
     {
         InputAction forwardAction, strafeAction, verticalAction, tvAction;
         AltitudeController altCtrl;
         AttitudeController attCtrl;
         HorizontalController horizCtrl;
-        SimplerDJIController djiCtrl;
+        DJIController djiCtrl;
 
         void Awake()
         {
@@ -27,7 +27,7 @@ namespace SmarcGUI.KeyboardControllers
             altCtrl = GetComponent<AltitudeController>();
             attCtrl = GetComponent<AttitudeController>();
             horizCtrl = GetComponent<HorizontalController>();
-            djiCtrl = GetComponent<SimplerDJIController>();
+            djiCtrl = GetComponent<DJIController>();
         }
 
         void OnEnable()

@@ -10,10 +10,10 @@ namespace M350.PSDK_ROS2
     [AddComponentMenu("Smarc/PSDK_ROS/PsdkControlMode")]
     public class PsdkControlMode : ROSPublisher<ControlModeMsg>
     {
-        SimplerDJIController controller;
+        DJIController controller;
         protected override void InitPublisher()
         {
-            controller = GetComponentInParent<SimplerDJIController>();
+            controller = GetComponentInParent<DJIController>();
             base.InitPublisher();
         }
 

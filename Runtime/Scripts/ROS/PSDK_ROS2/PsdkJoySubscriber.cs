@@ -16,14 +16,14 @@ namespace M350.PSDK_ROS2
         public float time_since_joy;
 
         bool registered = false;
-        SimplerDJIController controller;
+        DJIController controller;
 
         JoyMsg joy;
 
 
         protected override void StartROS()
         {
-            if (controller == null) controller = GetComponentInParent<SimplerDJIController>();
+            if (controller == null) controller = GetComponentInParent<DJIController>();
 
             JoyMsg ROSMsg = new();
             if (!registered)
@@ -43,7 +43,7 @@ namespace M350.PSDK_ROS2
             if (joy == null) return;
             if (controller == null)
             {
-                controller = GetComponentInParent<SimplerDJIController>();
+                controller = GetComponentInParent<DJIController>();
             }
             if (controller != null && joy != null)
             {

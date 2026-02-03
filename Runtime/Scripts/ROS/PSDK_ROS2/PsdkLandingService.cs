@@ -10,12 +10,12 @@ namespace M350.PSDK_ROS2
     public class PsdkLandingService : ROSBehaviour
     {
         bool registered = false;
-        SimplerDJIController controller = null;
+        DJIController controller = null;
 
         protected override void StartROS()
         {
             if(controller == null){
-                controller = GetComponentInParent<SimplerDJIController>();
+                controller = GetComponentInParent<DJIController>();
             }
             if (!registered)
             {
@@ -28,7 +28,7 @@ namespace M350.PSDK_ROS2
             TriggerResponse response = new TriggerResponse();
             if (controller == null)
             {
-                controller = GetComponentInParent<SimplerDJIController>();
+                controller = GetComponentInParent<DJIController>();
                 if (controller == null)
                 {
                     Debug.Log("Controller not found");

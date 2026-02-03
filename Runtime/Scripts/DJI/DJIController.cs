@@ -20,7 +20,7 @@ namespace dji
     [RequireComponent(typeof(AltitudeController))]
     [RequireComponent(typeof(AttitudeController))]
     [RequireComponent(typeof(HorizontalController))]
-    public class SimplerDJIController : MonoBehaviour
+    public class DJIController : MonoBehaviour
     {
         [Header("Settings")]
         public bool StartInAir = false;
@@ -45,6 +45,8 @@ namespace dji
         float commandedYawRate = 0f;
 
         MixedBody robotBody;
+
+        float stoppedFor = 0f;
 
         void Awake()
         {
@@ -92,9 +94,13 @@ namespace dji
                     break;
 
                 case DroneFlightState.Landing:
-                    altCtrl.ControlMode = AltitudeControlMode.AbsoluteAltitude;
-                    altCtrl.TargetAltitude = homeAltitude;
-                    if (robotBody.position.y <= altCtrl.TargetAltitude + altCtrl.AltitudeTolerance)
+                    altCtrl.ControlMode = AltitudeControlMode.VerticalVelocity;
+                    altCtrl.TargetVelocity = -altCtrl.DescentRate;
+                    bool stopped = Mathf.Abs(robotBody.velocity.y) <= 0.2f;
+                    if (stopped) stoppedFor += Time.fixedDeltaTime;
+                    else stoppedFor = 0f;
+                    bool stuck = stoppedFor >= 1.0f; // if we've been stopped for 1 second, consider ourselves stuck
+                    if (stuck)
                     {
                         flightState = DroneFlightState.Idle;
                         Debug.Log("Landing complete, now idle");
@@ -156,6 +162,7 @@ namespace dji
 
             Debug.Log("DJI Landing");
             flightState = DroneFlightState.Landing;
+            stoppedFor = 0f;
             return true;
         }
 
