@@ -39,8 +39,6 @@ namespace VehicleComponents.Actuators
         [Tooltip("Direction of torque")]
         public bool ReverseManualTorque = false;
 
-        public ArticulationBody baseLinkArticulationBody;
-        public Rigidbody baseLinkRigidBody;
         private float c_tau_f = 8.004e-4f;
 
 

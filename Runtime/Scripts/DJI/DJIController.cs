@@ -79,6 +79,8 @@ namespace dji
 
         void FixedUpdate()
         {
+            RPMsFromMotion();
+
             if (!GotControl) return;
 
             switch(flightState)
@@ -117,6 +119,7 @@ namespace dji
 
                     attCtrl.YawControlMode = YawControlMode.YawRate;
                     attCtrl.TargetYawRate = commandedYawRate;
+
                     break;
                 case DroneFlightState.Idle:
                 default:
@@ -206,6 +209,34 @@ namespace dji
             altCtrl.CompensateGravity = on;
             attCtrl.enabled = on;
             horizCtrl.enabled = on;
+        }
+
+        void RPMsFromMotion()
+        {
+            float tiltAngle = Vector3.Angle(robotBody.transform.up, Vector3.up);
+
+            // more tilt = higher RPM needed for all the props
+            float tiltFactor = 1f + (tiltAngle / 90f) * 0.5f; // scales from 1.0 to 1.5
+
+            // + if the hub of a prop is moving up or down, it needs more or less RPM
+            float maxSpeed = 5f;
+
+            float propSpeedFactor(Propeller p)
+            {
+                MixedBody body = p.GetMixedBody();
+                float verticalVelocity = Vector3.Dot(body.velocity, Vector3.up);
+                return 1f + (verticalVelocity / maxSpeed);
+            }
+
+            float flSpeedFactor = propSpeedFactor(frontLeftPropeller);
+            float frSpeedFactor = propSpeedFactor(frontRightPropeller);
+            float blSpeedFactor = propSpeedFactor(backLeftPropeller);
+            float brSpeedFactor = propSpeedFactor(backRightPropeller);
+
+            frontLeftPropeller.SetRpm(FloatRPM * tiltFactor * flSpeedFactor);
+            frontRightPropeller.SetRpm(FloatRPM * tiltFactor * frSpeedFactor);
+            backLeftPropeller.SetRpm(FloatRPM * tiltFactor * blSpeedFactor);
+            backRightPropeller.SetRpm(FloatRPM * tiltFactor * brSpeedFactor);
         }
 
         public void CommandFLUYawRate(float forward, float left, float up, float yawRate)
