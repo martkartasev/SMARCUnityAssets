@@ -221,10 +221,10 @@ namespace dji
 
             if (IsDualProp)
             {
-                frontLeftDownPropeller.SetRpm(on ? FloatRPM : 0f);
-                frontRightDownPropeller.SetRpm(on ? FloatRPM : 0f);
-                backLeftDownPropeller.SetRpm(on ? FloatRPM : 0f);
-                backRightDownPropeller.SetRpm(on ? FloatRPM : 0f);
+                frontLeftDownPropeller.SetRpm(frontLeftPropeller.rpm);
+                frontRightDownPropeller.SetRpm(frontRightPropeller.rpm);
+                backLeftDownPropeller.SetRpm(backLeftPropeller.rpm);
+                backRightDownPropeller.SetRpm(backRightPropeller.rpm);
             }
         }
 
@@ -257,10 +257,10 @@ namespace dji
 
             if (IsDualProp)
             {
-                frontLeftDownPropeller.SetRpm(FloatRPM * tiltFactor * flSpeedFactor);
-                frontRightDownPropeller.SetRpm(FloatRPM * tiltFactor * frSpeedFactor);
-                backLeftDownPropeller.SetRpm(FloatRPM * tiltFactor * blSpeedFactor);
-                backRightDownPropeller.SetRpm(FloatRPM * tiltFactor * brSpeedFactor);
+                frontLeftDownPropeller.SetRpm(frontLeftPropeller.rpm);
+                frontRightDownPropeller.SetRpm(frontRightPropeller.rpm);
+                backLeftDownPropeller.SetRpm(backLeftPropeller.rpm);
+                backRightDownPropeller.SetRpm(backRightPropeller.rpm);
             }
         }
 
