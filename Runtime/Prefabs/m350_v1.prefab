@@ -426,12 +426,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: SMARC.SMARCAssets::dji.SimplerDJIController
   StartInAir: 0
   GotControl: 1
+  flightState: 0
   frontLeftPropeller: {fileID: 7914359358507958576}
   frontRightPropeller: {fileID: 8211211513727453642}
   backLeftPropeller: {fileID: 8341314688662995929}
   backRightPropeller: {fileID: 1453933997702307484}
-  FloatRPM: 1000
-  flightState: 0
+  FloatRPM: 3000
+  IsDualProp: 0
+  frontLeftDownPropeller: {fileID: 0}
+  frontRightDownPropeller: {fileID: 0}
+  backLeftDownPropeller: {fileID: 0}
+  backRightDownPropeller: {fileID: 0}
 --- !u!114 &4016737064677842381
 MonoBehaviour:
   m_ObjectHideFlags: 0
