@@ -9,6 +9,7 @@ using ROS.Core;
 
 namespace ROS.Publishers
 {
+    [AddComponentMenu("Smarc/ROS/TF_Pub")]
     public class ROSTransformTreePublisher : ROSPublisher<TFMessageMsg>
     {
         [Header("TF Tree Publisher")]
