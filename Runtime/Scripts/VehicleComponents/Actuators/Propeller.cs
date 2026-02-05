@@ -61,8 +61,8 @@ namespace VehicleComponents.Actuators
             if (FakeSpin)
             {
                 // find visual and collision children
-                propVisual = parentMixedBody.transform.Find(VisualObjectName);
-                propCollision = parentMixedBody.transform.Find(CollisionObjectName);
+                propVisual = mixedBody.transform.Find(VisualObjectName);
+                propCollision = mixedBody.transform.Find(CollisionObjectName);
             }
         }
 
@@ -75,26 +75,28 @@ namespace VehicleComponents.Actuators
         public void DoUpdate()
         {
             if (Mathf.Abs(rpm) < RPMMin) rpm = 0;
-            Vector3 forceDirection = orientation == PropellerOrientation.ZForward ? parentMixedBody.transform.forward : parentMixedBody.transform.up;
 
             if (FakeSpin)
             {
+                int direction = reverse ? -1 : 1;
+                Vector3 spinAxis = orientation == PropellerOrientation.ZForward ? direction*Vector3.forward : direction*Vector3.up;
                 // just spin the visual and collision objects
                 if (propVisual != null)
                 {
-                    propVisual.Rotate(forceDirection, rpm * 6f * Time.fixedDeltaTime); // 6f to convert RPM to degrees per second
+                    propVisual.Rotate(spinAxis, rpm * 6f * Time.fixedDeltaTime); // 6f to convert RPM to degrees per second
                 }
                 if (propCollision != null)
                 {
-                    propCollision.Rotate(forceDirection, rpm * 6f * Time.fixedDeltaTime);
+                    propCollision.Rotate(spinAxis, rpm * 6f * Time.fixedDeltaTime);
                 }
                 return;
             }
 
             float r = rpm * RPMToForceMultiplier * (rpm < 0 ? RPMReverseMultiplier : 1f);
+            Vector3 forceDirection = orientation == PropellerOrientation.ZForward ? mixedBody.transform.forward : mixedBody.transform.up;
 
-            parentMixedBody.AddForceAtPosition(r * forceDirection,
-                parentMixedBody.transform.position,
+            mixedBody.AddForceAtPosition(r * forceDirection,
+                mixedBody.transform.position,
                 ForceMode.Force);
 
             // Dont spin the props (which lets physics handle the torques and such) if we are applying manual
@@ -105,12 +107,12 @@ namespace VehicleComponents.Actuators
                 int torque_sign = ReverseManualTorque ? 1 : -1;
                 float torque = torque_sign * c_tau_f * r;
                 Vector3 torqueVector = torque * transform.forward;
-                parentMixedBody.AddTorque(torqueVector, ForceMode.Force);
+                mixedBody.AddTorque(torqueVector, ForceMode.Force);
             }
             else
             {
                 int direction = reverse ? -1 : 1;
-                parentMixedBody.SetDriveTargetVelocity(ArticulationDriveAxis.X, direction * rpm);
+                mixedBody.SetDriveTargetVelocity(ArticulationDriveAxis.X, direction * rpm);
             }
         }
 

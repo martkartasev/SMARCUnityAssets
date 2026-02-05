@@ -1,5 +1,6 @@
 using Force;
 using Smarc.GenericControllers;
+using UnityEditor.EditorTools;
 using UnityEngine;
 using VehicleComponents.Actuators;
 
@@ -25,17 +26,25 @@ namespace dji
         [Header("Settings")]
         public bool StartInAir = false;
         public bool GotControl = true;
+        public DroneFlightState flightState = DroneFlightState.Idle;
 
-        [Header("Propellers")]
+        [Header("Propellers(Upper)")]
         public Propeller frontLeftPropeller;
         public Propeller frontRightPropeller;
         public Propeller backLeftPropeller;
         public Propeller backRightPropeller;
         public float FloatRPM = 1000f;
 
+        [Header("Propellers(Lower)")]
+        [Tooltip("If true, will also control the downwards facing propellers")]
+        public bool IsDualProp = false;
+        public Propeller frontLeftDownPropeller;
+        public Propeller frontRightDownPropeller;
+        public Propeller backLeftDownPropeller;
+        public Propeller backRightDownPropeller;
+
         float takeOffAltitude = 1.5f; // what the real thing does is 1.5m
         float homeAltitude; // altitude at which the drone took off
-        public DroneFlightState flightState = DroneFlightState.Idle;
 
         AltitudeController altCtrl;
         AttitudeController attCtrl;
@@ -209,6 +218,14 @@ namespace dji
             altCtrl.CompensateGravity = on;
             attCtrl.enabled = on;
             horizCtrl.enabled = on;
+
+            if (IsDualProp)
+            {
+                frontLeftDownPropeller.SetRpm(on ? FloatRPM : 0f);
+                frontRightDownPropeller.SetRpm(on ? FloatRPM : 0f);
+                backLeftDownPropeller.SetRpm(on ? FloatRPM : 0f);
+                backRightDownPropeller.SetRpm(on ? FloatRPM : 0f);
+            }
         }
 
         void RPMsFromMotion()
@@ -237,6 +254,14 @@ namespace dji
             frontRightPropeller.SetRpm(FloatRPM * tiltFactor * frSpeedFactor);
             backLeftPropeller.SetRpm(FloatRPM * tiltFactor * blSpeedFactor);
             backRightPropeller.SetRpm(FloatRPM * tiltFactor * brSpeedFactor);
+
+            if (IsDualProp)
+            {
+                frontLeftDownPropeller.SetRpm(FloatRPM * tiltFactor * flSpeedFactor);
+                frontRightDownPropeller.SetRpm(FloatRPM * tiltFactor * frSpeedFactor);
+                backLeftDownPropeller.SetRpm(FloatRPM * tiltFactor * blSpeedFactor);
+                backRightDownPropeller.SetRpm(FloatRPM * tiltFactor * brSpeedFactor);
+            }
         }
 
         public void CommandFLUYawRate(float forward, float left, float up, float yawRate)
