@@ -1,6 +1,7 @@
 using UnityEngine;
 using Force;
 using UnityEngine.InputSystem;
+using DefaultNamespace.Water;
 
 
 namespace Smarc.GenericControllers
@@ -8,7 +9,8 @@ namespace Smarc.GenericControllers
     public enum AltitudeControlMode
     {
         AbsoluteAltitude,
-        VerticalVelocity
+        VerticalVelocity,
+        AltitudeFromWater
     }
 
     [AddComponentMenu("Smarc/Generic Controllers/Altitude Controller")]
@@ -49,6 +51,7 @@ namespace Smarc.GenericControllers
         Transform COM;
         float totalMass;
 
+        WaterQueryModel waterModel;
 
 
         void Start()
@@ -67,6 +70,16 @@ namespace Smarc.GenericControllers
             if (ControlMode == AltitudeControlMode.AbsoluteAltitude)
             {
                 float diff = TargetAltitude - (robotBody.transform.position.y - GroundLevel);
+                if (Mathf.Abs(diff) <= AltitudeTolerance) TargetVelocity = 0f;
+                else TargetVelocity = Mathf.Sign(diff) * ((diff > 0) ? AscentRate : DescentRate);
+            }
+            if (ControlMode == AltitudeControlMode.AltitudeFromWater)
+            {
+                if (waterModel == null) waterModel = WaterQueryModel.GetWaterQueryModel();
+                
+                float waterHeight = waterModel.GetWaterLevelAt(robotBody.transform.position);
+                float currentAltitudeFromWater = robotBody.transform.position.y - waterHeight;
+                float diff = TargetAltitude - currentAltitudeFromWater;
                 if (Mathf.Abs(diff) <= AltitudeTolerance) TargetVelocity = 0f;
                 else TargetVelocity = Mathf.Sign(diff) * ((diff > 0) ? AscentRate : DescentRate);
             }
