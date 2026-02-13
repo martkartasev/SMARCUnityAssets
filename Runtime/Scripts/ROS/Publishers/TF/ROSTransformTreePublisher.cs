@@ -9,23 +9,14 @@ using ROS.Core;
 
 namespace ROS.Publishers
 {
-    public enum SupportedCoordinateFrames
-    {
-        DefaultSMARC = 0,
-        ENU = 1,
-        FLU = 2
-    }
-
+    [AddComponentMenu("Smarc/ROS/TF_Pub")]
     public class ROSTransformTreePublisher : ROSPublisher<TFMessageMsg>
     {
-        [Header("TF Tree Publisher")] public SupportedCoordinateFrames referenceFrame = SupportedCoordinateFrames.DefaultSMARC;
-
+        [Header("TF Tree Publisher")]
         [Tooltip("Frame between unity_origin and <robot_name>/odom. If empty, map == odom.")]
         public Transform MapFrameTransform;
-
         [Tooltip("Adds a prefix to all TF frames published by this publisher, except unity_origin.")]
         public string tf_prefix = "";
-
         TransformTreeNode BaseLinkTreeNode;
         GameObject BaseLinkGO;
         GameObject OdomLinkGO;
@@ -45,11 +36,6 @@ namespace ROS.Publishers
                 Debug.LogWarning($"TF Publisher topic set to {topic} but should be /tf. Setting to /tf!");
                 topic = "/tf";
             }
-
-            if (referenceFrame != SupportedCoordinateFrames.DefaultSMARC)
-            {
-                Debug.LogWarning("Non default reference frame in TF! Errors could occur!");
-            }
         }
 
         protected override void InitPublisher()
@@ -61,7 +47,6 @@ namespace ROS.Publishers
             {
                 OdomLinkGO = transform.gameObject;
             }
-
             if (GetBaseLink(out var baseLink))
             {
                 BaseLinkGO = baseLink.gameObject;
@@ -80,7 +65,6 @@ namespace ROS.Publishers
                 {
                     topParent = topParent.parent;
                 }
-
                 robot_name = topParent.name;
             }
 
@@ -116,18 +100,32 @@ namespace ROS.Publishers
             // |--------------- STATIC FRAMES ------------------------------------------------------------||------ very dynamic ---------||--- mixed ----|
             // utm -(0)-> utm_ZONE_BAND -(cached)-> unity_origin -(cached)-> VEHICLE/map -(cached)-> VEHICLE/odom -(dynamic)-> VEHICLE/base_link -> children...
 
+            var unityToMapMsg = new TransformMsg();
+            var mapToOdomMsg = new TransformMsg();
+
             if (MapFrameTransform == null) MapFrameTransform = OdomLinkGO.transform;
 
-            var unityToMapMsg = new TransformMsg();
             unityToMapMsg.translation = MapFrameTransform.To<ENU>().translation;
             unityToMapMsg.rotation = MapFrameTransform.To<FLU>().rotation;
+
+            Vector3 mapToOdomTransform = MapFrameTransform.InverseTransformPoint(OdomLinkGO.transform.position);
+            var mapToOdomPos = ENU.ConvertFromRUF(mapToOdomTransform);
+            mapToOdomMsg.translation = new Vector3Msg(
+                mapToOdomPos.x,
+                mapToOdomPos.y,
+                mapToOdomPos.z);
+            var mapToOdomOri = FLU.ConvertFromRUF(Quaternion.Inverse(MapFrameTransform.rotation) * OdomLinkGO.transform.rotation);
+            mapToOdomMsg.rotation = new QuaternionMsg(
+                mapToOdomOri.x,
+                mapToOdomOri.y,
+                mapToOdomOri.z,
+                mapToOdomOri.w);
 
             var unityToMap = new TransformStampedMsg(
                 new HeaderMsg(new TimeStamp(Clock.time), "unity_origin"),
                 $"{tf_prefix}{robot_name}/map",
                 unityToMapMsg);
 
-            var mapToOdomMsg = BuildMapToOdomMsg();
             var mapToOdom = new TransformStampedMsg(
                 new HeaderMsg(new TimeStamp(Clock.time), $"{tf_prefix}{robot_name}/map"),
                 $"{tf_prefix}{robot_name}/odom",
@@ -145,8 +143,22 @@ namespace ROS.Publishers
 
             var tfMessageList = new List<TransformStampedMsg>();
 
+            
             // odom -> base_link first
-            var odomToBaseLinkTFMSG = BuildOdomToBaseLinkTransformMsg();
+            var rosOdomPos = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localPosition);
+            var rosOdomOri = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localRotation);
+            var odomToBaseLinkTFMSG = new TransformMsg
+            {
+                translation = new Vector3Msg(
+                    rosOdomPos.x,
+                    rosOdomPos.y,
+                    rosOdomPos.z),
+                rotation = new QuaternionMsg(
+                    rosOdomOri.x,
+                    rosOdomOri.y,
+                    rosOdomOri.z,
+                    rosOdomOri.w)
+            };
             var odomToBaseLink = new TransformStampedMsg(
                 new HeaderMsg(new TimeStamp(Clock.time), "odom"),
                 BaseLinkTreeNode.name,
@@ -181,84 +193,16 @@ namespace ROS.Publishers
             {
                 staticTF.header.stamp = new TimeStamp(Clock.time);
             }
-
             // finally add the static frames last so they are not namespaced
             tfMessageList.AddRange(staticTFs);
 
             ROSMsg = new TFMessageMsg(tfMessageList.ToArray());
         }
 
-        private TransformMsg BuildMapToOdomMsg()
-        {
-            Vector3 mapToOdomTransform = MapFrameTransform.InverseTransformPoint(OdomLinkGO.transform.position);
-            Vector3 mapToOdomPos = ENU.ConvertFromRUF(mapToOdomTransform);
-            Quaternion mapToOdomOri = FLU.ConvertFromRUF(Quaternion.Inverse(MapFrameTransform.rotation) * OdomLinkGO.transform.rotation);
-
-            switch (referenceFrame)
-            {
-                case SupportedCoordinateFrames.DefaultSMARC:
-                    mapToOdomPos = ENU.ConvertFromRUF(mapToOdomTransform);
-                    mapToOdomOri = FLU.ConvertFromRUF(Quaternion.Inverse(MapFrameTransform.rotation) * OdomLinkGO.transform.rotation);
-                    break;
-                case SupportedCoordinateFrames.ENU:
-                    mapToOdomPos = ENU.ConvertFromRUF(mapToOdomTransform);
-                    mapToOdomOri = ENU.ConvertFromRUF(Quaternion.Inverse(MapFrameTransform.rotation) * OdomLinkGO.transform.rotation);
-                    break;
-                case SupportedCoordinateFrames.FLU:
-                    mapToOdomPos = FLU.ConvertFromRUF(mapToOdomTransform);
-                    mapToOdomOri = FLU.ConvertFromRUF(Quaternion.Inverse(MapFrameTransform.rotation) * OdomLinkGO.transform.rotation);
-                    break;
-            }
-
-            var mapToOdomMsg = new TransformMsg();
-            mapToOdomMsg.translation = new Vector3Msg(
-                mapToOdomPos.x,
-                mapToOdomPos.y,
-                mapToOdomPos.z);
-
-            mapToOdomMsg.rotation = new QuaternionMsg(
-                mapToOdomOri.x,
-                mapToOdomOri.y,
-                mapToOdomOri.z,
-                mapToOdomOri.w);
-            return mapToOdomMsg;
-        }
-
-        private TransformMsg BuildOdomToBaseLinkTransformMsg()
-        {
-            Vector3 rosOdomPos = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localPosition);
-            Quaternion rosOdomOri = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localRotation);
-
-            switch (referenceFrame)
-            {
-                case SupportedCoordinateFrames.DefaultSMARC:
-                case SupportedCoordinateFrames.ENU:
-                    rosOdomPos = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localPosition);
-                    rosOdomOri = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localRotation);
-                    break;
-                case SupportedCoordinateFrames.FLU:
-                    rosOdomPos = FLU.ConvertFromRUF(BaseLinkTreeNode.Transform.localPosition);
-                    rosOdomOri = FLU.ConvertFromRUF(BaseLinkTreeNode.Transform.localRotation);
-                    break;
-            }
-
-            return new TransformMsg
-            {
-                translation = new Vector3Msg(
-                    rosOdomPos.x,
-                    rosOdomPos.y,
-                    rosOdomPos.z),
-                rotation = new QuaternionMsg(
-                    rosOdomOri.x,
-                    rosOdomOri.y,
-                    rosOdomOri.z,
-                    rosOdomOri.w)
-            };
-        }
-
         public void SetBaseLinkName(string name)
         {
             robot_name = name;
         }
+
     }
 }

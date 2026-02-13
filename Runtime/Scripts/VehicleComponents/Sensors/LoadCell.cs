@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace VehicleComponents.Sensors
 {
+    [AddComponentMenu("Smarc/Sensor/LoadCell")]
     [RequireComponent(typeof(Joint))]
     public class LoadCell : Sensor
     {

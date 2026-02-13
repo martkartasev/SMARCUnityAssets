@@ -3,16 +3,14 @@ using Unity.Robotics.Core;
 using ROS.Core;
 using Force;
 using RosMessageTypes.Nav;
-using Scripts.ROS.Core;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 
 
 namespace ROS.Publishers.GroundTruth
 {
-    public class GT_Odom_Pub : ROSPublisher<OdometryMsg>
+    [AddComponentMenu("Smarc/ROS/GT_Odom_Pub")]
+    class GT_Odom_Pub : ROSPublisher<OdometryMsg>
     {
-        public CoordinateSpaceSelection targetSpace = CoordinateSpaceSelection.ENU;
-
         MixedBody body;
 
         protected override void InitPublisher()
@@ -38,11 +36,10 @@ namespace ROS.Publishers.GroundTruth
         protected override void UpdateMessage()
         {
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
-            ROSMsg.pose.pose.position = body.position.ToROS(targetSpace);
-            ROSMsg.pose.pose.orientation = body.rotation.ToROS(targetSpace);
+            ROSMsg.pose.pose.position = body.position.To<ENU>();
+            ROSMsg.pose.pose.orientation = body.rotation.To<ENU>();
 
-            var vel = body.transform.InverseTransformVector(body.velocity); 
-            ROSMsg.twist.twist.linear = vel.To<FLU>();
+            ROSMsg.twist.twist.linear = body.localVelocity.To<FLU>();
             var anvel = body.transform.InverseTransformVector(body.angularVelocity);
             ROSMsg.twist.twist.angular = -anvel.To<FLU>();
         }
