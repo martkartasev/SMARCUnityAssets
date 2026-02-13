@@ -154,7 +154,7 @@ public class ArticulationChainComponent : MonoBehaviour
         var findArticulationBodies = new List<ArticulationBody>();
 
         var comp = item.GetComponent<ArticulationBody>();
-        if (comp != null)
+        if (comp != null && comp.isActiveAndEnabled)
         {
             findArticulationBodies.Add(comp);
         }
