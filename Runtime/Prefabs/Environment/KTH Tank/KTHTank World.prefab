@@ -107,9 +107,9 @@ GameObject:
   - component: {fileID: 7041976936130688107}
   - component: {fileID: 917885928964355004}
   - component: {fileID: 1454882707445159324}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Floor
-  m_TagString: Untagged
+  m_TagString: wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -621,9 +621,9 @@ GameObject:
   - component: {fileID: 1983036066954610625}
   - component: {fileID: 2292537904317190128}
   - component: {fileID: 7926449512012043739}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Right
-  m_TagString: Untagged
+  m_TagString: wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -684,9 +684,9 @@ GameObject:
   - component: {fileID: 3403282854493139627}
   - component: {fileID: 6651445979123089930}
   - component: {fileID: 8361529822849221586}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Street
-  m_TagString: Untagged
+  m_TagString: wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -808,9 +808,9 @@ GameObject:
   - component: {fileID: 1517644984808909146}
   - component: {fileID: 6565894914847984656}
   - component: {fileID: 6627758587821662093}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Left
-  m_TagString: Untagged
+  m_TagString: wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -871,9 +871,9 @@ GameObject:
   - component: {fileID: 6959992875294193760}
   - component: {fileID: 7751673976359898753}
   - component: {fileID: 1817141062303533205}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Office
-  m_TagString: Untagged
+  m_TagString: wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
