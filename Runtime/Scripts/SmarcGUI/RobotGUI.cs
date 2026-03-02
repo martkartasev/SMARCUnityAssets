@@ -175,7 +175,7 @@ namespace SmarcGUI
                     ghostTF = Instantiate(GenericGhostPrefab).transform;
                 }
 
-                ghostTF.name = $"Remote {robotname}";
+                ghostTF.name = robotname;
                 ghostTF.SetParent(worldMarkersTF);
                 ghostTF.gameObject.SetActive(false);
                 ghost = ghostTF.GetComponent<RobotGhost>();
