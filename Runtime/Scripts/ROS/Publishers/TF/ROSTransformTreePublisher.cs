@@ -149,8 +149,10 @@ namespace ROS.Publishers
             if(!OnlyRelative)
             {
                 // odom -> base_link first, unless just doing relative, then no odom exists
-                var rosOdomPos = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localPosition);
-                var rosOdomOri = ENU.ConvertFromRUF(BaseLinkTreeNode.Transform.localRotation);
+                var odomPos = OdomLinkGO.transform.InverseTransformPoint(BaseLinkTreeNode.Transform.position);
+                var odomOri = Quaternion.Inverse(OdomLinkGO.transform.rotation) * BaseLinkTreeNode.Transform.rotation;
+                var rosOdomPos = ENU.ConvertFromRUF(odomPos);
+                var rosOdomOri = ENU.ConvertFromRUF(odomOri);
                 var odomToBaseLinkTFMSG = new TransformMsg
                 {
                     translation = new Vector3Msg(
