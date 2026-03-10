@@ -192,8 +192,9 @@ GameObject:
   - component: {fileID: 8242813396660009938}
   - component: {fileID: 8700646328544413416}
   - component: {fileID: 3557383463804399163}
+  - component: {fileID: 1032792362927442406}
   m_Layer: 0
-  m_Name: z1_base
+  m_Name: z1_base_link
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -296,6 +297,24 @@ ArticulationBody:
   m_Immovable: 1
   m_UseGravity: 0
   m_CollisionDetectionMode: 0
+--- !u!114 &1032792362927442406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2782914716996631544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78564e3e0c2d8c65cb6601a38bee530d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SMARC.SMARCAssets::ROS.Publishers.ROSTransformTreePublisher
+  topic: /tf
+  NotARobot: 1
+  frequency: 10
+  MapFrameTransform: {fileID: 0}
+  tf_prefix: 
+  OnlyRelative: 1
 --- !u!1 &4275634519142083404
 GameObject:
   m_ObjectHideFlags: 0
@@ -567,7 +586,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5291235962628053251}
-  - component: {fileID: 4071368444799597881}
   m_Layer: 0
   m_Name: z1_pro_camera
   m_TagString: Untagged
@@ -591,16 +609,3 @@ Transform:
   - {fileID: 8242813396660009938}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4071368444799597881
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8554301474802364730}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fba5fd74d37a6cf4284698624eb8f6aa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Robotics.UrdfImporter::Unity.Robotics.UrdfImporter.UrdfLink
-  IsBaseLink: 0
