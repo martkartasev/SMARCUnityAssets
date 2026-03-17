@@ -12,6 +12,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
             Params.Add("waypoints", new List<GeoPoint>());
             Params.Add("ceiling_altitude", -1.0);
             Params.Add("floor_altitude", 1.0);
+            Params.Add("stay_inside", true);
         }
     }
 
@@ -21,6 +22,8 @@ namespace SmarcGUI.MissionPlanning.Tasks
         {
             Name = "smarc-stop-geofence";
             Description = "Stop a geofence task";
+            Params.Add("reset_geofence", true);
+            Params.Add("reset_islands", true);
         }
     }
 }
