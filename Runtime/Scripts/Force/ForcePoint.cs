@@ -73,7 +73,7 @@ namespace Force
         private MixedBody body;
         private WaterQueryModel waterModel;
         private FrequencyTimer waterQueryTimer;
-        private ForcePoint[] allForcePoints;
+        private ForcePoint[] RelatedForcePoints;
 
 
         public Vector3 ApplyForce(Vector3 force, bool onlyUnderWater = false, bool onlyAboveWater = false)
@@ -86,7 +86,7 @@ namespace Force
 
             if (enabled)
             {
-                appliedForce = force / allForcePoints.Length;
+                appliedForce = force / RelatedForcePoints.Length;
                 body.AddForceAtPosition
                 (
                     appliedForce,
@@ -121,15 +121,18 @@ namespace Force
                 if (Mass == 0) Mass = body.mass;
             }
 
-            var waterModels = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None);
-            if (waterModels.Length > 0) waterModel = waterModels[0];
+            waterModel = WaterQueryModel.GetWaterQueryModel();
 
-            allForcePoints = body.gameObject.GetComponentsInChildren<ForcePoint>();
+            RelatedForcePoints = body.gameObject.GetComponentsInChildren<ForcePoint>();
+            // only consider points that are connected to the same body so that
+            // FPs can be grouped together, spread out as wanted, and allow "partial" forces on different
+            // parts of an articulation chain for example.
+            RelatedForcePoints = RelatedForcePoints.Where(p => p.ConnectedArticulationBody == ConnectedArticulationBody || p.ConnectedRigidbody == ConnectedRigidbody).ToArray();
             if (AutomaticCenterOfGravity)
             {
                 body.automaticCenterOfMass = false;
-                var centerOfMass = allForcePoints.Select(point => point.transform.localPosition).Aggregate(new Vector3(0, 0, 0), (s, v) => s + v);
-                body.centerOfMass = centerOfMass / allForcePoints.Length;
+                var centerOfMass = RelatedForcePoints.Select(point => point.transform.localPosition).Aggregate(new Vector3(0, 0, 0), (s, v) => s + v);
+                body.centerOfMass = centerOfMass / RelatedForcePoints.Length;
             }
 
             if (VolumeMesh == null && VolumeObject != null) VolumeMesh = VolumeObject.GetComponent<MeshFilter>().mesh;
@@ -142,9 +145,8 @@ namespace Force
         {
             if (waterModel == null)
             {
-                var waterModels = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None);
-                if (waterModels.Length <= 0) return;
-                waterModel = waterModels[0];
+                waterModel = WaterQueryModel.GetWaterQueryModel();
+                if (waterModel == null) return;
             }
 
             float waterSurfaceLevel = waterModel.GetWaterLevelAt(transform.position);
@@ -196,7 +198,7 @@ namespace Force
                 // and their drag really should reflect where they are moment to moment
                 // yes, all of the points will do the same thing. but this makes it so we dont need
                 // a central forcepoint controller or sth
-                var anyUnderwater = allForcePoints.Select(p => p.IsUnderwater).Aggregate(false, (s, v) => s || v);
+                var anyUnderwater = RelatedForcePoints.Select(p => p.IsUnderwater).Aggregate(false, (s, v) => s || v);
                 body.drag = anyUnderwater ? UnderwaterDrag : AirDrag;
                 body.angularDrag = anyUnderwater ? UnderwaterAngularDrag : AirAngularDrag;
             }
