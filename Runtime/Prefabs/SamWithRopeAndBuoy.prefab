@@ -101,6 +101,7 @@ GameObject:
   - component: {fileID: 7374556621640120581}
   - component: {fileID: 2616370943805638807}
   - component: {fileID: 4124543187775738142}
+  - component: {fileID: 6144668630631734985}
   m_Layer: 0
   m_Name: FPFront
   m_TagString: Untagged
@@ -142,10 +143,10 @@ MonoBehaviour:
   VolumeMesh: {fileID: 0}
   Volume: 0.05
   WaterDensity: 1000
-  DepthBeforeSubmerged: 0.5
+  DepthBeforeSubmerged: 0.6
   MaxBuoyancyForce: 1000
-  UnderwaterDrag: 2
-  UnderwaterAngularDrag: 1
+  UnderwaterDrag: 8
+  UnderwaterAngularDrag: 2
   AirDrag: 0.05
   AirAngularDrag: 0.05
   IsUnderwater: 0
@@ -174,6 +175,27 @@ MonoBehaviour:
   gizmoType: 0
   radius: 0.03
   color: {r: 1, g: 0, b: 0, a: 1}
+--- !u!135 &6144668630631734985
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4643357281737192030}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.08
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5219771632341763979
 GameObject:
   m_ObjectHideFlags: 0
@@ -368,6 +390,7 @@ MonoBehaviour:
   frequency: 10
   MapFrameTransform: {fileID: 0}
   tf_prefix: 
+  OnlyRelative: 0
 --- !u!1 &5990361341889169513
 GameObject:
   m_ObjectHideFlags: 0
@@ -470,7 +493,7 @@ GameObject:
   - component: {fileID: 2183234841545854701}
   - component: {fileID: 4409408350805400491}
   - component: {fileID: 1049581714640111003}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Buoy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -609,6 +632,7 @@ GameObject:
   - component: {fileID: 6837763641882152622}
   - component: {fileID: 8499554616489930609}
   - component: {fileID: 6492242691026580295}
+  - component: {fileID: 92135148245589941}
   m_Layer: 0
   m_Name: FPBack
   m_TagString: Untagged
@@ -650,10 +674,10 @@ MonoBehaviour:
   VolumeMesh: {fileID: 0}
   Volume: 0.05
   WaterDensity: 1000
-  DepthBeforeSubmerged: 0.5
+  DepthBeforeSubmerged: 0.6
   MaxBuoyancyForce: 1000
-  UnderwaterDrag: 2
-  UnderwaterAngularDrag: 1
+  UnderwaterDrag: 8
+  UnderwaterAngularDrag: 2
   AirDrag: 0.05
   AirAngularDrag: 0.05
   IsUnderwater: 0
@@ -682,6 +706,27 @@ MonoBehaviour:
   gizmoType: 0
   radius: 0.03
   color: {r: 1, g: 0, b: 0, a: 1}
+--- !u!135 &92135148245589941
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7894673528394025577}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.08
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &2189693490373312881
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -754,6 +799,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7530468694835774547, guid: 227b1dadc1d92004b98dbc2019661650,
+        type: 3}
+      propertyPath: m_Mass
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

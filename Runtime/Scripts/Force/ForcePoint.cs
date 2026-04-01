@@ -34,6 +34,9 @@ namespace Force
 
         [Tooltip("Maximum force applied by buoyancy. Nice to keep things from going to space :)")]
         public float MaxBuoyancyForce = 1000f;
+        [Tooltip("De-bounce factor. How many physics frames of look-ahead do we consider 'fast enough to jump out, dont apply buoyancy' when we are underwater? Helps prevent objects shooting to the moon if they are buoyant AND deep. Set to 0 to disable.")]
+        public int BuoyancyDebounceFrames = 3;
+
 
         [Header("Underwater/Air Drag")] [Tooltip("Linear Drag applied while underwater. Sets the connected body's drag/linearDamping value when underwater. Set to -1 to use the starting drag value of the body for this.")]
         public float UnderwaterDrag = -1f;
@@ -47,11 +50,15 @@ namespace Force
         [Tooltip("Angular Drag applied while underwater. Sets the connected body's drag/linearDamping value when above water. Set to -1 to use the starting drag value of the body for this.")]
         public float AirAngularDrag = -1f;
 
+
+
+
         [Header("Current state wrt water level")]
         public bool IsUnderwater = false;
-
         public bool IsSubmerged = false;
         public float CurrentDepth;
+
+
 
 
         [Header("Gravity")] [Tooltip("Do we over-ride the gravity of the connected body?")]
@@ -122,7 +129,7 @@ namespace Force
             }
 
             waterModel = WaterQueryModel.GetWaterQueryModel();
-
+            
             RelatedForcePoints = body.gameObject.GetComponentsInChildren<ForcePoint>();
             // only consider points that are connected to the same body so that
             // FPs can be grouped together, spread out as wanted, and allow "partial" forces on different
@@ -182,6 +189,15 @@ namespace Force
                 float waterForceScale = WaterQueryFrequency > 0 ? 1f / Time.fixedDeltaTime / WaterQueryFrequency : 1f;
                 if (IsUnderwater)
                 {
+                    // before apply any buoyancy, check if our current upward speed would already take us out of the water
+                    // so that we dont go to the moon. The correct way to do this would be to be able to _set_ the position
+                    // of the body OR increase sim frequency, but articulations remove the first option and increasing sim
+                    // frequency is expensive, so here we are.
+                    float upwardSpeed = Vector3.Dot(body.velocity, Vector3.up);
+                    float dx = upwardSpeed * Time.fixedDeltaTime * BuoyancyDebounceFrames;
+                    bool willSurfaceSoon = CurrentDepth - dx <= 0;
+                    if (willSurfaceSoon) waterForceScale *= CurrentDepth / dx;
+
                     float displacementMultiplier = Mathf.Clamp01(CurrentDepth / DepthBeforeSubmerged);
                     var buoyancyForceMag = Volume * WaterDensity * Math.Abs(Physics.gravity.y) * displacementMultiplier;
                     buoyancyForceMag = Mathf.Min(MaxBuoyancyForce, buoyancyForceMag);
