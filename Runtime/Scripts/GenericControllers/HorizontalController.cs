@@ -1,6 +1,5 @@
 using UnityEngine;
 using Force;
-using UnityEngine.InputSystem;
 
 
 namespace Smarc.GenericControllers
@@ -81,14 +80,21 @@ namespace Smarc.GenericControllers
                 return;
             }
 
-            if (ControlMode == HorizontalControlMode.UnityPosition)
-            {
-                Vector3 diff = TargetUnityPosition - COM.position;
-                if (diff.magnitude <= PositionTolerance) TargetVelocity = Vector3.zero;
-                else TargetVelocity = diff.normalized * MaxSpeed;
-            }
-            TargetVelocity.y = 0;
+           
 
+            if (ControlMode == HorizontalControlMode.UnityPosition && currentSpeed <= MaxSpeed)
+            {
+                if (currentSpeed > MaxSpeed) TargetVelocity = Vector3.zero;
+                else
+                {
+                    Vector3 diff = TargetUnityPosition - COM.position;
+                    if (diff.magnitude <= PositionTolerance) TargetVelocity = Vector3.zero;
+                    else TargetVelocity = diff.normalized * MaxSpeed;
+                    Debug.DrawLine(COM.position, TargetUnityPosition, Color.green);
+                }
+            }
+            
+            TargetVelocity.y = 0;
             VelocityControl();
         }
 
