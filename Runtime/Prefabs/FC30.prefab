@@ -5302,6 +5302,7 @@ MonoBehaviour:
   p1: {fileID: 7804527782484352368}
   p2: {fileID: 6107677940908191336}
   p3: {fileID: 1422271091232739523}
+  DualProp: 1
 --- !u!114 &6082087200577232483
 MonoBehaviour:
   m_ObjectHideFlags: 0
