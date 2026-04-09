@@ -23,6 +23,8 @@ namespace Smarc.Rope
         MixedBody EndBody;
 
         public bool Float = true;
+        [Tooltip("Set to the layer that you want the rope to collide with.")]
+        public int RopeLayer = 6;
 
 
         [Min(0f)]
@@ -114,7 +116,7 @@ namespace Smarc.Rope
             nodeTester = new GameObject
             {
                 name = "Node Tester",
-                layer = 8
+                layer = RopeLayer
             };
             nodeCollider = nodeTester.AddComponent<SphereCollider>();
             nodeCollider.radius = nodeColliderRadius;

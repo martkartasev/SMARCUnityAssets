@@ -633,7 +633,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5291235962628053251}
   m_Layer: 0
-  m_Name: z1_pro_camera
+  m_Name: Z1Pro Gimbal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5702548535888196492}
   - component: {fileID: 3351639166538090555}
   - component: {fileID: 2528768415796309188}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102,7 +102,7 @@ GameObject:
   - component: {fileID: 2616370943805638807}
   - component: {fileID: 4124543187775738142}
   - component: {fileID: 6144668630631734985}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FPFront
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -145,6 +145,7 @@ MonoBehaviour:
   WaterDensity: 1000
   DepthBeforeSubmerged: 0.6
   MaxBuoyancyForce: 1000
+  BuoyancyDebounceFrames: 3
   UnderwaterDrag: 8
   UnderwaterAngularDrag: 2
   AirDrag: 0.05
@@ -208,7 +209,7 @@ GameObject:
   - component: {fileID: 1092193410714961519}
   - component: {fileID: 6953711299293690922}
   - component: {fileID: 5463172129880745976}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: SamWithRopeAndBuoy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -359,6 +360,7 @@ MonoBehaviour:
   EndRB: {fileID: 0}
   EndAB: {fileID: 1049581714640111003}
   Float: 1
+  RopeLayer: 6
   RopeLength: 4
   RopeWidth: 0.04
   SegmentCount: 100
@@ -493,7 +495,7 @@ GameObject:
   - component: {fileID: 2183234841545854701}
   - component: {fileID: 4409408350805400491}
   - component: {fileID: 1049581714640111003}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Buoy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -633,7 +635,7 @@ GameObject:
   - component: {fileID: 8499554616489930609}
   - component: {fileID: 6492242691026580295}
   - component: {fileID: 92135148245589941}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FPBack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -676,6 +678,7 @@ MonoBehaviour:
   WaterDensity: 1000
   DepthBeforeSubmerged: 0.6
   MaxBuoyancyForce: 1000
+  BuoyancyDebounceFrames: 3
   UnderwaterDrag: 8
   UnderwaterAngularDrag: 2
   AirDrag: 0.05
