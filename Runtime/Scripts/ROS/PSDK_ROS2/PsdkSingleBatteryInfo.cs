@@ -15,7 +15,6 @@ namespace M350.PSDK_ROS2
         Battery batt;
         protected override void InitPublisher()
         {
-            base.InitPublisher();
             batt = GetComponent<Battery>();
         }
 
