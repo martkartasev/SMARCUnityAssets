@@ -21,7 +21,7 @@ namespace M350.PSDK_ROS2
         protected override void UpdateMessage()
         {
             ROSMsg.voltage = batt.currentVoltage;
-            ROSMsg.capacity_percentage = batt.currentPercent;
+            ROSMsg.capacity_percentage = batt.currentPercent/100f;
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
         }
     }
