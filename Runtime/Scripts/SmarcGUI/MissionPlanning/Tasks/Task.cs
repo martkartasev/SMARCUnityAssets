@@ -65,7 +65,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
             {
                 var paramValue = param.Value;
                 Type paramType = null;
-                if(param.Key == "waypoint" || param.Key.Contains("position"))
+                if(param.Key == "waypoint" || param.Key.Contains("position") || param.Key.Contains("poi"))
                 {
                     switch(Name)
                     {
@@ -89,6 +89,9 @@ namespace SmarcGUI.MissionPlanning.Tasks
                             break;
                         case "auv-hydrobatic-move-to":
                             paramType = typeof(AuvHydrobaticPoint);
+                            break;
+                        case "z1-pro-cmd":
+                            paramType = typeof(GeoPoint);
                             break;
                         default:
                             break;
