@@ -309,16 +309,22 @@ namespace dji
                 float verticalVelocity = Vector3.Dot(body.velocity, Vector3.up);
                 return 1f + (verticalVelocity / maxSpeed);
             }
+            
+            float idle_mult = flightState == DroneFlightState.Idle ? 0f : 1f;
+            float landing_mult = flightState == DroneFlightState.Landing ? 0.5f : 1f;
+            float takingoff_mult = flightState == DroneFlightState.TakingOff ? 1.5f : 1f;
+            float state_mult = idle_mult * landing_mult * takingoff_mult;
 
             float flSpeedFactor = propSpeedFactor(frontLeftPropeller);
             float frSpeedFactor = propSpeedFactor(frontRightPropeller);
             float blSpeedFactor = propSpeedFactor(backLeftPropeller);
             float brSpeedFactor = propSpeedFactor(backRightPropeller);
 
-            frontLeftPropeller.SetRpm(FloatRPM * tiltFactor * flSpeedFactor);
-            frontRightPropeller.SetRpm(FloatRPM * tiltFactor * frSpeedFactor);
-            backLeftPropeller.SetRpm(FloatRPM * tiltFactor * blSpeedFactor);
-            backRightPropeller.SetRpm(FloatRPM * tiltFactor * brSpeedFactor);
+
+            frontLeftPropeller.SetRpm(FloatRPM * tiltFactor * flSpeedFactor * state_mult);
+            frontRightPropeller.SetRpm(FloatRPM * tiltFactor * frSpeedFactor * state_mult);
+            backLeftPropeller.SetRpm(FloatRPM * tiltFactor * blSpeedFactor * state_mult);
+            backRightPropeller.SetRpm(FloatRPM * tiltFactor * brSpeedFactor * state_mult);
 
             if (IsDualProp)
             {
