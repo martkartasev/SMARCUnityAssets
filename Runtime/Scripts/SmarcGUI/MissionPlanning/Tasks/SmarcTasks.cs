@@ -33,11 +33,12 @@ namespace SmarcGUI.MissionPlanning.Tasks
         {
             Name = "z1-pro-cmd";
             Description = "Send a command to the Z1 Pro";
-            Params.Add("frame", 0);
             Params.Add("roll", 0f);
             Params.Add("pitch", 0f);
             Params.Add("yaw", 0f);
+            Params.Add("track_poi", false);
             Params.Add("poi", new GeoPoint());
+            Params.Add("frame", 0);
             Params.Add("channel", 0);
             // Params.Add("resolution", 0);
         }
