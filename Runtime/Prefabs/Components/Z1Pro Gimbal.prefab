@@ -141,6 +141,9 @@ MonoBehaviour:
   roll: 0
   pitch: 0
   yaw: 0
+  reverseRoll: 1
+  reversePitch: 0
+  reverseYaw: 1
 --- !u!114 &966934063012685692
 MonoBehaviour:
   m_ObjectHideFlags: 0

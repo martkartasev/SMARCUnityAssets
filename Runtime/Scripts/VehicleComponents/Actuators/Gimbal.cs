@@ -11,6 +11,11 @@ namespace VehicleComponents.Actuators
         public float pitch = 0f;
         public float yaw = 0f;
 
+        [Header("Reversing")]
+        public bool reverseRoll = false;
+        public bool reversePitch = false;
+        public bool reverseYaw = false;
+
         void LateUpdate()
         {
             Transform parent = transform.parent;
@@ -33,7 +38,8 @@ namespace VehicleComponents.Actuators
             Quaternion baseYaw = Quaternion.LookRotation(yawForward, worldUp);
 
             // Yaw input is relative to parent yaw, around gravity up.
-            Quaternion yawRot = Quaternion.AngleAxis(yaw, worldUp);
+            int yawSign = reverseYaw ? -1 : 1;
+            Quaternion yawRot = Quaternion.AngleAxis(yawSign * yaw, worldUp);
 
             // After yaw, define local axes for pitch/roll in the gravity-based frame.
             Quaternion yawFrame = yawRot * baseYaw;
@@ -41,8 +47,10 @@ namespace VehicleComponents.Actuators
             Vector3 forwardAxis = yawFrame * Vector3.forward;
 
             // Pitch around local right, roll around local forward.
-            Quaternion pitchRot = Quaternion.AngleAxis(pitch, rightAxis);
-            Quaternion rollRot  = Quaternion.AngleAxis(roll, forwardAxis);
+            int pitchSign = reversePitch ? -1 : 1;
+            int rollSign = reverseRoll ? -1 : 1;
+            Quaternion pitchRot = Quaternion.AngleAxis(pitchSign * pitch, rightAxis);
+            Quaternion rollRot  = Quaternion.AngleAxis(rollSign * roll, forwardAxis);
 
             transform.rotation = rollRot * pitchRot * yawFrame;
         }
