@@ -5253,6 +5253,7 @@ MonoBehaviour:
   topic: wrapper/psdk_ros2/home_point
   NotARobot: 0
   frequency: 10
+  UnityHomePosition: {x: 0, y: 0, z: 0}
 --- !u!114 &9217948330569890686
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5260,7 +5261,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7982597064404111922}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eb9b955243da0d7479eaf3e1724006ee, type: 3}
   m_Name: 
