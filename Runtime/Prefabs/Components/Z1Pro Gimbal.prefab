@@ -156,7 +156,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91fcb7e5654361f488d3d279815d74c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SMARC.SMARCAssets::ROS.Subscribers.GimbalCommand_Sub
-  topic: gimbal_camera/gimbal_ctrl
+  topic: gimbal_camera/gimbal_cmd
   NotARobot: 0
   expectedFrequency: -1
   resetting: 0

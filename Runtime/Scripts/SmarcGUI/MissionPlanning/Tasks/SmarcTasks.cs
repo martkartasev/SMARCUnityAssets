@@ -27,20 +27,24 @@ namespace SmarcGUI.MissionPlanning.Tasks
         }
     }
 
-    public class Z1ProCmd : Task
+    public class GimbalSetRpy : Task
     {
         public override void SetParams()
         {
-            Name = "z1-pro-cmd";
-            Description = "Send a command to the Z1 Pro";
+            Name = "gimbal-set-rpy";
+            Description = "Set the roll, pitch, and yaw of the gimbal";
             Params.Add("roll", 0f);
             Params.Add("pitch", 0f);
             Params.Add("yaw", 0f);
-            Params.Add("track_poi", false);
-            Params.Add("poi", new GeoPoint());
-            Params.Add("frame", 0);
-            Params.Add("channel", 0);
-            // Params.Add("resolution", 0);
+        }
+    }
+
+    public class GimbalStop : Task
+    {
+        public override void SetParams()
+        {
+            Name = "gimbal-stop";
+            Description = "Stop the gimbal";
         }
     }
 }
