@@ -86,6 +86,8 @@ namespace SmarcGUI.MissionPlanning.Tasks
             Name = "alars-follow-auv";
             Description = "Follow an AUV in the water";
             Params.Add("follow_altitude", 15.0f);
+            Params.Add("vulture_radius", 0.0f);
+            Params.Add("vulture_speed_deg", 10.0f);
         }
     }
 
