@@ -3,7 +3,7 @@ using SmarcGUI.MissionPlanning.Params;
 namespace SmarcGUI.MissionPlanning.Tasks
 {
 
-    public class AlarsTakeOff : Task
+    public class AlarsTakeoff : Task
     {
         public override void SetParams()
         {
@@ -79,14 +79,13 @@ namespace SmarcGUI.MissionPlanning.Tasks
         }
     }
 
-    public class AlarsLocalize : Task
+    public class AlarsFollowAuv : Task
     {
         public override void SetParams()
         {
-            Name = "alars-localize";
-            Description = "Localize an AUV in the water by moving above the camera detection points";
-            Params.Add("localize_auv", true);
-            Params.Add("localize_buoy", false);
+            Name = "alars-follow-auv";
+            Description = "Follow an AUV in the water";
+            Params.Add("follow_altitude", 15.0f);
         }
     }
 
