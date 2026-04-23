@@ -70,8 +70,6 @@ namespace SmarcGUI.MissionPlanning.Tasks
         {
             Name = "alars-recover";
             Description = "Hook a rope in the water";
-            Params.Add("object_position", new GeoPoint());
-            Params.Add("buoy_position", new GeoPoint());
             Params.Add("forward_distance", 2.0f);
             Params.Add("forward_altitude", 3.0f);
             Params.Add("dipping_altitude", 7.0f);
