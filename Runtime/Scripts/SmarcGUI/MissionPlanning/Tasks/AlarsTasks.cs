@@ -45,12 +45,13 @@ namespace SmarcGUI.MissionPlanning.Tasks
         {
             Name = "alars-bt";
             Description = "Run the entire ALARS system";
+            Params.Add("num_retries", 5);
             Params.Add("search_position", new GeoPoint());
-            Params.Add("delivery_position", new GeoPoint());
             Params.Add("forward_distance", 2.0f);
             Params.Add("forward_altitude", 3.0f);
             Params.Add("dipping_altitude", 7.0f);
             Params.Add("raising_altitude", 15.0f);
+            Params.Add("delivery_position", new GeoPoint());
         }
     }
 
