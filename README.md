@@ -48,6 +48,9 @@ If at any point, you needed help, got the help, and the help was not about using
 That way, we can identify gaps in our documentation and hopefully add them in for the next person.
 
 
+# You are probably done here. Continue if this is not your first ever Unity project.
+
+
 ## Installation for non-SMaRC projects
 
 We rely on a few non unity asset store packages, so follow the instructions below to install the package into your project.
