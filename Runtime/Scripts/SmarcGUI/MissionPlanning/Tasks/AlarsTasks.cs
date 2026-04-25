@@ -39,7 +39,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
         }
     }
 
-    public class AlarsBT : Task
+    public class AlarsBt : Task
     {
         public override void SetParams()
         {

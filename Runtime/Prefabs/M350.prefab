@@ -370,7 +370,7 @@ MonoBehaviour:
   StartInAir: 1
   GotControl: 1
   flightState: 0
-  WinchLoadCell: {fileID: 0}
+  WinchLoadCell: {fileID: 2055320253788536532}
   CompensateForPayload: 1
   frontLeftPropeller: {fileID: 7914359358507958576}
   frontRightPropeller: {fileID: 8211211513727453642}
@@ -6138,6 +6138,11 @@ PrefabInstance:
       propertyPath: m_ParentAnchorPosition.z
       value: 0.0030001928
       objectReference: {fileID: 0}
+    - target: {fileID: 711336033948055900, guid: f6eed5e4995c4b51f9df75c76b1260b6,
+        type: 3}
+      propertyPath: m_Mass
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4186162112233665112, guid: f6eed5e4995c4b51f9df75c76b1260b6,
         type: 3}
       propertyPath: m_ParentAnchorPosition.y
@@ -6314,6 +6319,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 5323466477470113046}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2055320253788536532 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6153384320300311490, guid: f6eed5e4995c4b51f9df75c76b1260b6,
+    type: 3}
+  m_PrefabInstance: {fileID: 5323466477470113046}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a55151a7d68c9914aaf583ac1f6d4848, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SMARC.SMARCAssets::VehicleComponents.Sensors.LoadCell
 --- !u!1001 &6144775602230365970
 PrefabInstance:
   m_ObjectHideFlags: 0
