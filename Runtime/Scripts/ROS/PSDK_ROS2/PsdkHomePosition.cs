@@ -11,6 +11,7 @@ namespace M350.PSDK_ROS2
     public class PsdkHomePosition : ROSPublisher<NavSatFixMsg>
     {
         GlobalReferencePoint globalReferencePoint;
+        public Vector3 UnityHomePosition;
 
         protected override void InitPublisher()
         {
@@ -30,6 +31,7 @@ namespace M350.PSDK_ROS2
                 ROSMsg.latitude = lat * Mathf.Deg2Rad;
                 ROSMsg.longitude = lon * Mathf.Deg2Rad;
                 ROSMsg.altitude = robotGO.transform.position.y;
+                UnityHomePosition = robotGO.transform.position;
                 Debug.Log($"[PsdkHomePosition] Home position set to: {lat},{lon} from robot position {robotGO.transform.position}");
             }
             else
@@ -38,6 +40,7 @@ namespace M350.PSDK_ROS2
                 enabled = false;
                 return;
             }
+
         }
 
         

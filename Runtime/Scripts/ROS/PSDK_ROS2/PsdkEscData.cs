@@ -13,6 +13,8 @@ namespace M350.PSDK_ROS2
     {
 
         public Propeller p0,p1,p2,p3;
+        [Tooltip("If true, the RPMs of upper props will be published as lower prop RPMs as well.")]
+        public bool DualProp = false;
         protected override void UpdateMessage() 
         {
             /*
@@ -29,11 +31,22 @@ namespace M350.PSDK_ROS2
             EscStatusIndividualMsg e3 = new EscStatusIndividualMsg();
             e3.speed = (short)p3.rpm;
             
-            EscStatusIndividualMsg[] dummyESCs = new EscStatusIndividualMsg[4];
+            EscStatusIndividualMsg[] dummyESCs;
+            if(DualProp) dummyESCs = new EscStatusIndividualMsg[8];
+            else dummyESCs = new EscStatusIndividualMsg[4];
+
             dummyESCs[0] = e0;
             dummyESCs[1] = e1;
             dummyESCs[2] = e2;
             dummyESCs[3] = e3;
+
+            if(DualProp)
+            {
+                dummyESCs[4] = e0;
+                dummyESCs[5] = e1;
+                dummyESCs[6] = e2;
+                dummyESCs[7] = e3;
+            }
 
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
             ROSMsg.esc = dummyESCs;

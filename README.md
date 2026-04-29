@@ -28,6 +28,20 @@ Run Unity Hub:
 You can find more detailed instructions on using all available vehicles, sensors, connections, UIs etc. [here](./Documentation/README.md).
 
 
+## ROS connection
+- We use the [ROS-TCP-Endpoint](https://github.com/KKalem/ROS-TCP-Endpoint) package to speak to ROS2. 
+  - You can use [this simple script](../scripts/unity_ros_bridge.sh) to run the bridge and then use `rviz2` and `rqt` to check what things look like in ROS.
+- The ROS connection is especially useful when you are running headless.
+
+
+### ROS Messages
+These are generated from within the editor:
+- Robotics -> Generate ROS Messages...
+- Fill in the fields in the pop-up
+  - Usually you can not generate these INTO the SMARCAssets package, so place the RosMessages folder anywhere for now
+- Cut/Paste the generated RosMessages folder into `SMARCAssets/Runtime/Scripts/VehicleComponents/ROS/Core/RosMessages`
+
+
 ## How to cite
 ```
 @INPROCEEDINGS{11139391,
@@ -46,6 +60,9 @@ You can find more detailed instructions on using all available vehicles, sensors
 ## Help!
 If at any point, you needed help, got the help, and the help was not about using Unity (Good example:"How do I make my vehicle buoyant?". Bad example: "How do I move this object in the editor?"), please [open an issue in github](https://github.com/smarc-project/SMARCUnityAssets/issues) (and tag it with "Documentation" if you can). 
 That way, we can identify gaps in our documentation and hopefully add them in for the next person.
+
+
+# You are probably done here. Continue if this is not your first ever Unity project.
 
 
 ## Installation for non-SMaRC projects

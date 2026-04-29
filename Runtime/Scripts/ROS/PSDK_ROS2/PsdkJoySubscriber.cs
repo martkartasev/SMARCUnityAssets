@@ -50,7 +50,7 @@ namespace M350.PSDK_ROS2
                 time_since_joy = (float)Clock.time - joy.header.stamp.sec - joy.header.stamp.nanosec / Mathf.Pow(10f, 9f);
                 if (time_since_joy < joy_timeout && joy.axes.Length >= 3)
                 {
-                    controller.CommandFLUYawRate(joy.axes[0], joy.axes[1], joy.axes[2], 0f);
+                    controller.CommandFLUYawRate(joy.axes[0], joy.axes[1], joy.axes[2], joy.axes.Length >= 4 ? joy.axes[3] : 0f);
                 }
                 else
                 {

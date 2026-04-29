@@ -3,19 +3,55 @@ using SmarcGUI.MissionPlanning.Params;
 namespace SmarcGUI.MissionPlanning.Tasks
 {
 
-    public class AlarsBT : Task
+    public class AlarsTakeoff : Task
+    {
+        public override void SetParams()
+        {
+            Name = "alars-takeoff";
+            Description = "Take off here.";
+        }
+    }
+
+    public class AlarsLand : Task
+    {
+        public override void SetParams()
+        {
+            Name = "alars-land";
+            Description = "Land here.";
+        }
+    }
+
+    public class AlarsTakeControl : Task
+    {
+        public override void SetParams()
+        {
+            Name = "alars-take-control";
+            Description = "Take control of the drone.";
+        }
+    }
+
+    public class AlarsReleaseControl : Task
+    {
+        public override void SetParams()
+        {
+            Name = "alars-release-control";
+            Description = "Release control of the drone.";
+        }
+    }
+
+    public class AlarsBt : Task
     {
         public override void SetParams()
         {
             Name = "alars-bt";
             Description = "Run the entire ALARS system";
-            Params.Add("initial_travel_alt", 25.0f);
+            Params.Add("num_retries", 5);
             Params.Add("search_position", new GeoPoint());
-            Params.Add("delivery_position", new GeoPoint());
             Params.Add("forward_distance", 2.0f);
             Params.Add("forward_altitude", 3.0f);
             Params.Add("dipping_altitude", 7.0f);
             Params.Add("raising_altitude", 15.0f);
+            Params.Add("delivery_position", new GeoPoint());
         }
     }
 
@@ -35,23 +71,23 @@ namespace SmarcGUI.MissionPlanning.Tasks
         {
             Name = "alars-recover";
             Description = "Hook a rope in the water";
-            Params.Add("object_position", new GeoPoint());
-            Params.Add("buoy_position", new GeoPoint());
             Params.Add("forward_distance", 2.0f);
             Params.Add("forward_altitude", 3.0f);
             Params.Add("dipping_altitude", 7.0f);
             Params.Add("raising_altitude", 15.0f);
+            Params.Add("no_buoy_radius", -1.0f);
         }
     }
 
-    public class AlarsLocalize : Task
+    public class AlarsFollowAuv : Task
     {
         public override void SetParams()
         {
-            Name = "alars-localize";
-            Description = "Localize an AUV in the water by moving above the camera detection points";
-            Params.Add("localize_auv", true);
-            Params.Add("localize_buoy", false);
+            Name = "alars-follow-auv";
+            Description = "Follow an AUV in the water";
+            Params.Add("follow_altitude", 15.0f);
+            Params.Add("vulture_radius", 0.0f);
+            Params.Add("vulture_speed_deg", 10.0f);
         }
     }
 
